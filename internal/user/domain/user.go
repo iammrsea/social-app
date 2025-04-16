@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"slices"
+	"strings"
 )
 
 type User struct {
@@ -34,20 +35,20 @@ var (
 
 func NewUser(id, email, username string, role UserRole, reputation *userReputation) (User, error) {
 	user := User{}
-	if id == "" {
+	if strings.TrimSpace(id) == "" {
 		return user, ErrUserIdRequired
 	}
-	if email == "" {
+	if strings.TrimSpace(email) == "" {
 		return user, ErrUserEmailRequired
 	}
-	if username == "" {
+	if strings.TrimSpace(username) == "" {
 		return user, ErrUsernameRequired
 	}
-	if role == "" {
+	if strings.TrimSpace(string(role)) == "" {
 		return user, ErrUserRoleRequired
 	}
 	if !isValidRole(role) {
-		return user, fmt.Errorf("invalid user role. Valid user roles are %s, %s and %s", admin, moderator, regular)
+		return user, fmt.Errorf("invalid user role. Valid user roles are %s, %s and %s", Admin, Moderator, Regular)
 	}
 
 	if reputation == nil {
@@ -70,13 +71,13 @@ func MustNewUser(id, email, username string, role UserRole, reputation *userRepu
 
 func NewRegularUser(id, email, username string, reputation *userReputation) (User, error) {
 	user := User{}
-	if id == "" {
+	if strings.TrimSpace(id) == "" {
 		return user, ErrUserIdRequired
 	}
-	if email == "" {
+	if strings.TrimSpace(email) == "" {
 		return user, ErrUserEmailRequired
 	}
-	if username == "" {
+	if strings.TrimSpace(username) == "" {
 		return user, ErrUsernameRequired
 	}
 
@@ -87,7 +88,7 @@ func NewRegularUser(id, email, username string, reputation *userReputation) (Use
 		}
 	}
 
-	return User{id: id, email: email, username: username, role: regular, reputation: reputation, banStatus: &banning{isBanned: false}}, nil
+	return User{id: id, email: email, username: username, role: Regular, reputation: reputation, banStatus: &banning{isBanned: false}}, nil
 }
 
 func NewUserReputation(score int, badges []string) (*userReputation, error) {
@@ -106,7 +107,7 @@ func MustNewUserReputation(score int, badges []string) *userReputation {
 }
 
 func (u *User) ChangeUsername(newUsername string) error {
-	if newUsername == "" {
+	if strings.TrimSpace(newUsername) == "" {
 		return ErrUsernameRequired
 	}
 	u.username = newUsername
@@ -114,15 +115,19 @@ func (u *User) ChangeUsername(newUsername string) error {
 }
 
 func (u *User) AwardBadge(badge string) error {
-	if badge == "" {
+	if strings.TrimSpace(badge) == "" {
 		return ErrBadgeRequired
 	}
 	u.reputation.badges = append(u.reputation.badges, badge)
 	return nil
 }
 
+func (u *User) IsZero() bool {
+	return u == &User{}
+}
+
 func (u *User) RevokeAwardedBadge(badge string) error {
-	if badge == "" {
+	if strings.TrimSpace(badge) == "" {
 		return ErrBadgeRequired
 	}
 	badges := u.reputation.badges

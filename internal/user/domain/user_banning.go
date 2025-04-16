@@ -2,6 +2,7 @@ package domain
 
 import (
 	"errors"
+	"strings"
 	"time"
 )
 
@@ -13,13 +14,13 @@ type banning struct {
 	to             time.Time
 }
 
-type banTimeline struct {
+type BanTimeline struct {
 	from time.Time
 	to   time.Time
 }
 
-func NewBanTimeline(from, to time.Time) *banTimeline {
-	return &banTimeline{from: from, to: to}
+func NewBanTimeline(from, to time.Time) *BanTimeline {
+	return &BanTimeline{from: from, to: to}
 }
 
 // Keep error messages here so we can import and reuse them for unit testing
@@ -30,8 +31,8 @@ var (
 	ErrUserIsNotBanned     = errors.New("user you are trying to unban is not banned")
 )
 
-func (u *User) Ban(reason string, isInDefinitely bool, timeline *banTimeline) error {
-	if reason == "" {
+func (u *User) Ban(reason string, isInDefinitely bool, timeline *BanTimeline) error {
+	if strings.TrimSpace(reason) == "" {
 		return ErrEmptyReason
 	}
 	if u.banStatus.isBanned {
@@ -46,6 +47,7 @@ func (u *User) Ban(reason string, isInDefinitely bool, timeline *banTimeline) er
 	if timeline != nil {
 		u.banStatus.from = timeline.from
 		u.banStatus.to = timeline.to
+		u.banStatus.isInDefinitely = false
 	}
 
 	return nil

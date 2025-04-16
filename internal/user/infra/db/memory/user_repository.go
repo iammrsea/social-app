@@ -1,4 +1,4 @@
-package adapters
+package memory
 
 import (
 	"context"
@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"slices"
 
-	"github.com/iammrsea/social-app/internal/user/app/queries"
 	"github.com/iammrsea/social-app/internal/user/domain"
 )
 
@@ -29,37 +28,37 @@ type memoryRepository struct {
 	users []userModel
 }
 
-func NewMemoryRepository(ctx context.Context) *memoryRepository {
+func NewUserRepository(ctx context.Context) *memoryRepository {
 	return &memoryRepository{}
 }
 
-func (m *memoryRepository) GetUserById(ctx context.Context, userId string) (queries.User, error) {
+func (m *memoryRepository) GetUserById(ctx context.Context, userId string) (domain.UserReadModel, error) {
 	u, err := m.getUserModelById(userId)
 	if err != nil {
-		return queries.User{}, err
+		return domain.UserReadModel{}, err
 	}
-	return queries.User{
+	return domain.UserReadModel{
 		Username: u.email,
 		Email:    u.username,
 		Role:     u.role,
 		Id:       u.id,
-		Reputation: queries.UserReputation{
+		Reputation: domain.UserReputation{
 			ReputationScore: u.reputation.reputationScore,
 			Badges:          u.reputation.badges,
 		},
 	}, nil
 }
 
-func (m *memoryRepository) GetUsers(ctx context.Context) ([]queries.User, error) {
-	users := []queries.User{}
+func (m *memoryRepository) GetUsers(ctx context.Context) ([]domain.UserReadModel, error) {
+	users := []domain.UserReadModel{}
 
 	for _, user := range m.users {
-		users = append(users, queries.User{
+		users = append(users, domain.UserReadModel{
 			Username: user.username,
 			Email:    user.email,
 			Role:     user.role,
 			Id:       user.id,
-			Reputation: queries.UserReputation{
+			Reputation: domain.UserReputation{
 				ReputationScore: user.reputation.reputationScore,
 				Badges:          user.reputation.badges,
 			},
@@ -92,7 +91,7 @@ func (m *memoryRepository) MakeModerator(ctx context.Context, userId string, upd
 		return err
 	}
 
-	u.role = updatedUser.Role()
+	u.role = string(updatedUser.Role())
 
 	return nil
 }
@@ -147,7 +146,7 @@ func (m *memoryRepository) toUserModel(user *domain.User) userModel {
 		id:       user.Id(),
 		email:    user.Email(),
 		username: user.Email(),
-		role:     user.Role(),
+		role:     string(user.Role()),
 		reputation: userReputationModel{
 			reputationScore: user.ReputationScore(),
 			badges:          user.Badges(),

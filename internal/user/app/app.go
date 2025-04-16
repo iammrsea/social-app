@@ -1,24 +1,24 @@
 package app
 
 import (
-	"github.com/iammrsea/social-app/internal/user/app/commands"
-	"github.com/iammrsea/social-app/internal/user/app/queries"
+	"github.com/iammrsea/social-app/internal/user/app/command"
+	"github.com/iammrsea/social-app/internal/user/app/query"
 )
 
 type Application struct {
-	CommandHandlers
-	QueryHandlers
+	CommandHandler
+	QueryHandler
 }
 
-type CommandHandlers struct {
-	commands.RegisterUserHandler
-	commands.RevokeAwardedBagdeHandler
-	commands.AwardBadgeHandler
-	commands.MakeModeratorHandler
-	commands.ChangeUsernameHandler
+type CommandHandler struct {
+	command.RegisterUserHandler
+	command.RevokeAwardedBagdeHandler
+	command.AwardBadgeHandler
+	command.MakeModeratorHandler
+	command.ChangeUsernameHandler
 }
 
-type QueryHandlers struct {
-	queries.GetUserHandler
-	queries.GetUsersHandler
+type QueryHandler struct {
+	query.GetUserHandler
+	query.GetUsersHandler
 }

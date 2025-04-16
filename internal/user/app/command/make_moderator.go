@@ -1,11 +1,11 @@
-package commands
+package command
 
 import (
 	"context"
 	"errors"
 
 	"github.com/iammrsea/social-app/internal/shared"
-	userDomain "github.com/iammrsea/social-app/internal/user/domain"
+	"github.com/iammrsea/social-app/internal/user/domain"
 )
 
 type MakeModeratorCommand struct {
@@ -15,10 +15,10 @@ type MakeModeratorCommand struct {
 type MakeModeratorHandler = shared.CommandHandler[MakeModeratorCommand]
 
 type makeModeratorCommandHandler struct {
-	userRepo userDomain.Repository
+	userRepo domain.UserRepository
 }
 
-func NewMakeModeratorCommandHandler(userRepo userDomain.Repository) MakeModeratorHandler {
+func NewMakeModeratorCommandHandler(userRepo domain.UserRepository) MakeModeratorHandler {
 	if userRepo == nil {
 		panic("nil user Repository")
 	}
@@ -26,7 +26,7 @@ func NewMakeModeratorCommandHandler(userRepo userDomain.Repository) MakeModerato
 }
 
 func (r *makeModeratorCommandHandler) Handle(ctx context.Context, cmd MakeModeratorCommand) error {
-	err := r.userRepo.MakeModerator(ctx, cmd.Id, func(user *userDomain.User) (*userDomain.User, error) {
+	err := r.userRepo.MakeModerator(ctx, cmd.Id, func(user *domain.User) (*domain.User, error) {
 		err := user.MakeModerator()
 		if err != nil {
 			return user, err

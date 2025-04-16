@@ -1,4 +1,4 @@
-package commands
+package command
 
 import (
 	"context"
@@ -6,7 +6,7 @@ import (
 	"errors"
 
 	"github.com/iammrsea/social-app/internal/shared"
-	userDomain "github.com/iammrsea/social-app/internal/user/domain"
+	"github.com/iammrsea/social-app/internal/user/domain"
 )
 
 type RegisterUserCommand struct {
@@ -17,10 +17,10 @@ type RegisterUserCommand struct {
 type RegisterUserHandler = shared.CommandHandler[RegisterUserCommand]
 
 type registerUserCommandHandler struct {
-	userRepo userDomain.Repository
+	userRepo domain.UserRepository
 }
 
-func NewRegisterUserCommandHandler(userRepo userDomain.Repository) RegisterUserHandler {
+func NewRegisterUserCommandHandler(userRepo domain.UserRepository) RegisterUserHandler {
 	if userRepo == nil {
 		panic("nil user Repository")
 	}
@@ -29,7 +29,7 @@ func NewRegisterUserCommandHandler(userRepo userDomain.Repository) RegisterUserH
 
 func (r *registerUserCommandHandler) Handle(ctx context.Context, cmd RegisterUserCommand) error {
 	id := rand.Text()
-	user, err := userDomain.NewRegularUser(id, cmd.Email, cmd.Username, nil)
+	user, err := domain.NewRegularUser(id, cmd.Email, cmd.Username, nil)
 	if err != nil {
 		return errors.Unwrap(err)
 	}

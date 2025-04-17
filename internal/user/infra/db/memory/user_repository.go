@@ -38,8 +38,28 @@ func (m *memoryRepository) GetUserById(ctx context.Context, userId string) (doma
 		return domain.UserReadModel{}, err
 	}
 	return domain.UserReadModel{
-		Username: u.email,
-		Email:    u.username,
+		Username: u.username,
+		Email:    u.email,
+		Role:     u.role,
+		Id:       u.id,
+		Reputation: domain.UserReputation{
+			ReputationScore: u.reputation.reputationScore,
+			Badges:          u.reputation.badges,
+		},
+	}, nil
+}
+
+func (m *memoryRepository) GetUserByEmail(ctx context.Context, email string) (domain.UserReadModel, error) {
+	i := slices.IndexFunc(m.users, func(u userModel) bool {
+		return email == u.email
+	})
+	if i < 0 {
+		return domain.UserReadModel{}, fmt.Errorf("user with email %s does not exist", email)
+	}
+	u := m.users[i]
+	return domain.UserReadModel{
+		Username: u.username,
+		Email:    u.email,
 		Role:     u.role,
 		Id:       u.id,
 		Reputation: domain.UserReputation{
@@ -145,7 +165,7 @@ func (m *memoryRepository) toUserModel(user *domain.User) userModel {
 	return userModel{
 		id:       user.Id(),
 		email:    user.Email(),
-		username: user.Email(),
+		username: user.Username(),
 		role:     string(user.Role()),
 		reputation: userReputationModel{
 			reputationScore: user.ReputationScore(),

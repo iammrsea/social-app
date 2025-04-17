@@ -27,7 +27,3 @@ func NewApplication(ctx context.Context) app.Application {
 		},
 	}
 }
-
-// func test(){
-// 	NewApplication()
-// }

@@ -1,0 +1,39 @@
+type User {
+    id: ID!
+    username: String!
+    email: String!
+    role: UserRole!
+    reputation: UserReputation
+}
+
+type UserReputation {
+    reputationScore: Int!
+    badges: [String!]!
+}
+
+enum UserRole {
+    REGULAR
+    MODERATOR
+    ADMIN
+}
+
+input ChangeUsername {
+    id: ID!
+    username: String!
+}
+
+input RegisterUser {
+    email: String!
+    username: String!
+}
+
+extend type Query {
+    getUserById(id: ID!): User
+    getUsers: [User]!
+}
+
+extend type Mutation {
+    changeUsername(input: ChangeUsername!): User
+    makeModerator(id: ID!): User
+    registerUser(input: RegisterUser!): User
+}

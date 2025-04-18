@@ -72,7 +72,7 @@ func TestMakeModerator(t *testing.T) {
 
 		savedUser, err := memRepo.GetUserById(ctx, user.Id())
 		assert.Nil(t, err)
-		assert.Equal(t, savedUser.Role, string(domain.Moderator))
+		assert.Equal(t, savedUser.Role, domain.Moderator.String())
 	})
 
 	t.Run("should return correct error if user does not exist", func(t *testing.T) {
@@ -308,7 +308,7 @@ func userDomainToUserReadModel(user domain.User) domain.UserReadModel {
 	return domain.UserReadModel{
 		Username: user.Username(),
 		Email:    user.Email(),
-		Role:     string(user.Role()),
+		Role:     user.Role().String(),
 		Id:       user.Id(),
 		Reputation: domain.UserReputation{
 			ReputationScore: user.ReputationScore(),

@@ -10,10 +10,10 @@ import (
 )
 
 // Constructor of the user application layer
-func NewApplication(ctx context.Context) app.Application {
+func NewUserService(ctx context.Context) *app.Application {
 	userRepo := memory.NewUserRepository(ctx)
 
-	return app.Application{
+	return &app.Application{
 		CommandHandler: app.CommandHandler{
 			RegisterUserHandler:       command.NewRegisterUserCommandHandler(userRepo),
 			RevokeAwardedBagdeHandler: command.NewRevokeAwardedBadgeCommandHandler(userRepo),

@@ -1,3 +1,4 @@
 demo.go
 .env
 .env.production
+tmp

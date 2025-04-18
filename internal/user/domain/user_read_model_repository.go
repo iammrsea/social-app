@@ -10,4 +10,5 @@ type GetUsersOptions struct {
 type UserReadModelRepository interface {
 	GetUsers(ctx context.Context, opts GetUsersOptions) (users []*UserReadModel, hasNext bool, err error)
 	GetUserById(ctx context.Context, id string) (*UserReadModel, error)
+	GetUserByEmail(ctx context.Context, email string) (*UserReadModel, error)
 }

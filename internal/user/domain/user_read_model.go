@@ -5,7 +5,7 @@ import "time"
 type UserReadModel struct {
 	Username   string         `json:"username"`
 	Email      string         `json:"email"`
-	Role       string         `json:"role"`
+	Role       UserRole       `json:"role"`
 	Id         string         `json:"id"`
 	Reputation UserReputation `json:"reputation"`
 	CreatedAt  time.Time      `json:"created_at"`

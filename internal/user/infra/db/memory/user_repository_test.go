@@ -309,7 +309,7 @@ func userDomainToUserReadModel(user domain.User) domain.UserReadModel {
 	return domain.UserReadModel{
 		Username: user.Username(),
 		Email:    user.Email(),
-		Role:     user.Role().String(),
+		Role:     user.Role(),
 		Id:       user.Id(),
 		Reputation: domain.UserReputation{
 			ReputationScore: user.ReputationScore(),

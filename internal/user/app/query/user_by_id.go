@@ -13,7 +13,7 @@ type UserByIdRepository interface {
 	GetUserById(ctx context.Context, id string) (*domain.UserReadModel, error)
 }
 
-type GetUserHandler = shared.QueryHandler[GetUserByIdCommand, *domain.UserReadModel]
+type GetUserByIdHandler = shared.QueryHandler[GetUserByIdCommand, *domain.UserReadModel]
 
 type GetUserByIdCommand struct {
 	Id string
@@ -23,7 +23,7 @@ type getUserByIdCommandHandler struct {
 	queryRepo domain.UserReadModelRepository
 }
 
-func NewGetUserByIdCommandHandler(queryRepo domain.UserReadModelRepository) GetUserHandler {
+func NewGetUserByIdCommandHandler(queryRepo domain.UserReadModelRepository) GetUserByIdHandler {
 	if queryRepo == nil {
 		panic("nil user repository")
 	}

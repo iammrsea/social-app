@@ -22,8 +22,9 @@ func NewUserService(ctx context.Context) *app.Application {
 			ChangeUsernameHandler:     command.NewChangeUsernameCommandHandler(userRepo),
 		},
 		QueryHandler: app.QueryHandler{
-			GetUserHandler:  query.NewGetUserByIdCommandHandler(userRepo),
-			GetUsersHandler: query.NewGetUsersCommandHandler(userRepo),
+			GetUserByIdHandler:    query.NewGetUserByIdCommandHandler(userRepo),
+			GetUsersHandler:       query.NewGetUsersCommandHandler(userRepo),
+			GetUserByEmailHandler: query.NewGetUserByEmailCommandHandler(userRepo),
 		},
 	}
 }

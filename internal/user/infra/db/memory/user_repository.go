@@ -42,7 +42,7 @@ func (m *memoryRepository) GetUserById(ctx context.Context, userId string) (*dom
 	return &domain.UserReadModel{
 		Username: u.username,
 		Email:    u.email,
-		Role:     u.role,
+		Role:     domain.UserRole(u.role),
 		Id:       u.id,
 		Reputation: domain.UserReputation{
 			ReputationScore: u.reputation.reputationScore,
@@ -62,7 +62,7 @@ func (m *memoryRepository) GetUserByEmail(ctx context.Context, email string) (*d
 	return &domain.UserReadModel{
 		Username: u.username,
 		Email:    u.email,
-		Role:     u.role,
+		Role:     domain.UserRole(u.role),
 		Id:       u.id,
 		Reputation: domain.UserReputation{
 			ReputationScore: u.reputation.reputationScore,
@@ -78,7 +78,7 @@ func (m *memoryRepository) GetUsers(ctx context.Context, opts domain.GetUsersOpt
 		users = append(users, &domain.UserReadModel{
 			Username: user.username,
 			Email:    user.email,
-			Role:     user.role,
+			Role:     domain.UserRole(user.role),
 			Id:       user.id,
 			Reputation: domain.UserReputation{
 				ReputationScore: user.reputation.reputationScore,
@@ -169,7 +169,7 @@ func (m *memoryRepository) toUserModel(user *domain.User) *userModel {
 		id:        user.Id(),
 		email:     user.Email(),
 		username:  user.Username(),
-		role:      string(user.Role()),
+		role:      user.Role().String(),
 		createdAt: user.JoinedAt(),
 		reputation: userReputationModel{
 			reputationScore: user.ReputationScore(),

@@ -19,6 +19,7 @@ type CommandHandler struct {
 }
 
 type QueryHandler struct {
-	query.GetUserHandler
+	query.GetUserByIdHandler
 	query.GetUsersHandler
+	query.GetUserByEmailHandler
 }

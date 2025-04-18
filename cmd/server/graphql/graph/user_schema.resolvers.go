@@ -6,33 +6,61 @@ package graph
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/iammrsea/social-app/cmd/server/graphql/graph/model"
 	"github.com/iammrsea/social-app/internal/shared/pagination"
+	"github.com/iammrsea/social-app/internal/user/app/command"
 	"github.com/iammrsea/social-app/internal/user/app/query"
 	"github.com/iammrsea/social-app/internal/user/domain"
 )
 
 // ChangeUsername is the resolver for the changeUsername field.
 func (r *mutationResolver) ChangeUsername(ctx context.Context, input model.ChangeUsername) (*domain.UserReadModel, error) {
-	panic(fmt.Errorf("not implemented: ChangeUsername - changeUsername"))
+	err := r.Services.UserService.CommandHandler.ChangeUsernameHandler.Handle(ctx, command.ChangeUsernameCommand{
+		Id:       input.ID,
+		Username: input.Username,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return r.Services.UserService.QueryHandler.GetUserByIdHandler.Handle(ctx, query.GetUserByIdCommand{
+		Id: input.ID,
+	})
 }
 
 // MakeModerator is the resolver for the makeModerator field.
 func (r *mutationResolver) MakeModerator(ctx context.Context, id string) (*domain.UserReadModel, error) {
-	panic(fmt.Errorf("not implemented: MakeModerator - makeModerator"))
+	err := r.Services.UserService.CommandHandler.MakeModeratorHandler.Handle(ctx, command.MakeModeratorCommand{
+		Id: id,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return r.Services.UserService.QueryHandler.GetUserByIdHandler.Handle(ctx, query.GetUserByIdCommand{
+		Id: id,
+	})
 }
 
 // RegisterUser is the resolver for the registerUser field.
 func (r *mutationResolver) RegisterUser(ctx context.Context, input model.RegisterUser) (*domain.UserReadModel, error) {
-	panic(fmt.Errorf("not implemented: RegisterUser - registerUser"))
+	err := r.Services.UserService.CommandHandler.RegisterUserHandler.Handle(ctx, command.RegisterUserCommand{
+		Email:    input.Email,
+		Username: input.Username,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return r.Services.UserService.QueryHandler.GetUserByEmailHandler.Handle(ctx, query.GetUserByEmailCommand{
+		Email: input.Email,
+	})
 }
 
 // GetUserByID is the resolver for the getUserById field.
 func (r *queryResolver) GetUserByID(ctx context.Context, id string) (*domain.UserReadModel, error) {
-	panic(fmt.Errorf("not implemented: GetUserByID - getUserById"))
+	return r.Services.UserService.QueryHandler.GetUserByIdHandler.Handle(ctx, query.GetUserByIdCommand{
+		Id: id,
+	})
 }
 
 // GetUsers is the resolver for the getUsers field.
@@ -89,12 +117,12 @@ func (r *queryResolver) GetUsers(ctx context.Context, first *int32, after *strin
 
 // Role is the resolver for the role field.
 func (r *userResolver) Role(ctx context.Context, obj *domain.UserReadModel) (domain.UserRole, error) {
-	panic(fmt.Errorf("not implemented: Role - role"))
+	return obj.Role, nil
 }
 
 // ReputationScore is the resolver for the reputationScore field.
 func (r *userReputationResolver) ReputationScore(ctx context.Context, obj *domain.UserReputation) (int32, error) {
-	panic(fmt.Errorf("not implemented: ReputationScore - reputationScore"))
+	return int32(obj.ReputationScore), nil
 }
 
 // User returns UserResolver implementation.

@@ -24,11 +24,13 @@ type ENV_VARIABLE string
 const (
 	AUTH_SECRET ENV_VARIABLE = "AUTH_SECRET"
 	GO_ENV      ENV_VARIABLE = "GO_ENV"
+	PORT        ENV_VARIABLE = "PORT"
 )
 
 type env struct {
 	authSecret string
 	goEnv      Environment
+	port       string
 }
 
 func (e *env) AuthSecret() string {
@@ -37,6 +39,10 @@ func (e *env) AuthSecret() string {
 
 func (e *env) GoEnv() Environment {
 	return e.goEnv
+}
+
+func (e *env) Port() string {
+	return e.port
 }
 
 func init() {
@@ -49,6 +55,8 @@ func init() {
 	}
 }
 
+const DEFAULT_PORT = "8080"
+
 func Env() *env {
 	authSecret := getEnv(AUTH_SECRET)
 	if strings.TrimSpace(authSecret) == "" {
@@ -58,10 +66,16 @@ func Env() *env {
 	if strings.TrimSpace(goEnv) == "" {
 		panic(fmt.Sprintf("%s environment variable is not set", GO_ENV))
 	}
+	port := getEnv(PORT)
+
+	if strings.TrimSpace(port) == "" {
+		port = DEFAULT_PORT
+	}
 
 	return &env{
 		authSecret: authSecret,
 		goEnv:      Environment(goEnv),
+		port:       port,
 	}
 }
 

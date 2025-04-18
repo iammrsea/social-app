@@ -5,7 +5,7 @@ type UserReadModel struct {
 	Email      string         `json:"email"`
 	Role       string         `json:"role"`
 	Id         string         `json:"id"`
-	Reputation UserReputation `json:"reputation,omitempty"`
+	Reputation UserReputation `json:"reputation"`
 }
 
 type UserReputation struct {

@@ -8,10 +8,14 @@ import (
 type UserRole string
 
 const (
-	Admin     UserRole = "admin"
-	Moderator UserRole = "moderator"
-	Regular   UserRole = "regular"
+	Admin     UserRole = "ADMIN"
+	Moderator UserRole = "MODERATOR"
+	Regular   UserRole = "REGULAR"
 )
+
+func (r UserRole) String() string {
+	return string(r)
+}
 
 func (u *User) IsModerator() bool {
 	return u.role == Moderator

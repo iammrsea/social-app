@@ -5,13 +5,13 @@ import (
 	"errors"
 
 	"github.com/iammrsea/social-app/internal/shared"
+	"github.com/iammrsea/social-app/internal/shared/auth"
 	"github.com/iammrsea/social-app/internal/user/domain"
 )
 
 type ChangeUsernameCommand struct {
-	Id           string
-	Username     string
-	LoggedInUser *domain.User
+	Id       string
+	Username string
 }
 
 type ChangeUsernameHandler = shared.CommandHandler[ChangeUsernameCommand]
@@ -28,7 +28,11 @@ func NewChangeUsernameCommandHandler(userRep domain.UserRepository) ChangeUserna
 }
 
 func (c *changeUsernameCommandHandler) Handle(ctx context.Context, cmd ChangeUsernameCommand) error {
-	if cmd.LoggedInUser.Id() != cmd.Id {
+	authUser := auth.GetUserFromCtx(ctx)
+	if !authUser.IsAuthenticated() {
+		return errors.New("unauthorized")
+	}
+	if authUser.Id != cmd.Id {
 		return errors.New("username cannot be changed by proxy")
 	}
 	err := c.userRepo.ChangeUsername(ctx, cmd.Id, func(user *domain.User) (*domain.User, error) {

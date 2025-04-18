@@ -5,19 +5,22 @@ import (
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/iammrsea/social-app/internal/shared/config"
+	"github.com/iammrsea/social-app/internal/user/domain"
 )
 
-func GetFakeUser() *Authenticateduser {
-	return &Authenticateduser{
+func GetFakeUser() *AuthenticatedUser {
+	return &AuthenticatedUser{
 		Email: "johndoe@example.com",
 		Id:    "user-123",
+		Role:  domain.Moderator,
 	}
 }
 
-func GenerateTestToken(user *Authenticateduser) string {
+func GenerateTestToken(user *AuthenticatedUser) string {
 	claims := AuthClaims{
 		UserId: user.Id,
 		Email:  user.Email,
+		Role:   user.Role,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * 24)),
 		},

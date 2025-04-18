@@ -10,6 +10,7 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/iammrsea/social-app/cmd/server/graphql"
 	"github.com/iammrsea/social-app/internal"
+	"github.com/iammrsea/social-app/internal/shared/auth"
 	"github.com/iammrsea/social-app/internal/shared/config"
 	"github.com/iammrsea/social-app/internal/user/service"
 )
@@ -19,11 +20,12 @@ func main() {
 
 	router := chi.NewRouter()
 
-	// A good base middleware stack
 	router.Use(middleware.RequestID)
 	router.Use(middleware.RealIP)
 	router.Use(middleware.Logger)
 	router.Use(middleware.Recoverer)
+
+	router.Use(auth.AuthMiddleware)
 
 	// Set a timeout value on the request context (ctx), that will signal
 	// through ctx.Done() that the request has timed out and further

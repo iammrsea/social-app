@@ -5,13 +5,13 @@ import (
 	"errors"
 
 	"github.com/iammrsea/social-app/internal/shared"
+	"github.com/iammrsea/social-app/internal/shared/auth"
 	"github.com/iammrsea/social-app/internal/user/domain"
 )
 
 type AwardBadgeCommand struct {
-	Id           string
-	Badge        string
-	LoggedInUser *domain.User
+	Id    string
+	Badge string
 }
 
 type AwardBadgeHandler = shared.CommandHandler[AwardBadgeCommand]
@@ -28,7 +28,11 @@ func NewAwardBadgeCommandHandler(userRepo domain.UserRepository) AwardBadgeHandl
 }
 
 func (a *awardBagdeCommandHandler) Handle(ctx context.Context, cmd AwardBadgeCommand) error {
-	if !cmd.LoggedInUser.IsAdmin() {
+	authUser := auth.GetUserFromCtx(ctx)
+	if !authUser.IsAuthenticated() {
+		return errors.New("unauthorized")
+	}
+	if authUser.Role != domain.Admin {
 		return errors.New("only an admin can award a badge to a user")
 	}
 	err := a.userRepo.AwardBadge(ctx, cmd.Id, func(user *domain.User) (*domain.User, error) {

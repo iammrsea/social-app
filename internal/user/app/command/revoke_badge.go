@@ -5,13 +5,13 @@ import (
 	"errors"
 
 	"github.com/iammrsea/social-app/internal/shared"
+	"github.com/iammrsea/social-app/internal/shared/auth"
 	"github.com/iammrsea/social-app/internal/user/domain"
 )
 
 type RevokeAwardedBadgeCommand struct {
-	Id           string
-	Badge        string
-	LoggedInUser *domain.User
+	Id    string
+	Badge string
 }
 
 type RevokeAwardedBagdeHandler = shared.CommandHandler[RevokeAwardedBadgeCommand]
@@ -28,7 +28,12 @@ func NewRevokeAwardedBadgeCommandHandler(userRepo domain.UserRepository) RevokeA
 }
 
 func (r *revokeAwardedBagdeCommandHandler) Handle(ctx context.Context, cmd RevokeAwardedBadgeCommand) error {
-	if !cmd.LoggedInUser.IsAdmin() {
+	authUser := auth.GetUserFromCtx(ctx)
+	if !authUser.IsAuthenticated() {
+		return errors.New("unauthorized")
+	}
+
+	if authUser.Role != domain.Admin {
 		return errors.New("only an admin can revoke a badge awarded to a user")
 	}
 	err := r.userRepo.RevokeAwardedBadge(ctx, cmd.Id, func(user *domain.User) (*domain.User, error) {

@@ -13,16 +13,16 @@ import (
 func TestParseTokenFromRequest(t *testing.T) {
 	t.Parallel()
 
-	t.Run("should return error if token is invalid", func(t *testing.T) {
+	t.Run("should return zero AuthClaims if token is invalid", func(t *testing.T) {
 		t.Parallel()
 		req := httptest.NewRequest(http.MethodGet, "/some-url", nil)
 
 		req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", "token"))
 
-		claims, err := auth.ParseTokenFromRequest(req)
+		claims := auth.ParseTokenFromRequest(req)
 
-		assert.Nil(t, claims)
-		assert.NotNil(t, err)
+		assert.NotNil(t, claims)
+		assert.True(t, claims.IsZero())
 
 	})
 	t.Run("should return claims if token is valid", func(t *testing.T) {
@@ -33,11 +33,12 @@ func TestParseTokenFromRequest(t *testing.T) {
 		token := auth.GenerateTestToken(fakeUser)
 		req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token))
 
-		claims, err := auth.ParseTokenFromRequest(req)
+		claims := auth.ParseTokenFromRequest(req)
 
-		assert.Nil(t, err)
 		assert.NotNil(t, claims)
+		assert.False(t, claims.IsZero())
 		assert.Equal(t, fakeUser.Email, claims.Email)
+		assert.Equal(t, fakeUser.Role, claims.Role)
 		assert.Equal(t, fakeUser.Id, claims.UserId)
 		assert.False(t, claims.ExpiresAt.IsZero())
 	})

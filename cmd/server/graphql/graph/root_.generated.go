@@ -51,18 +51,36 @@ type ComplexityRoot struct {
 		Vote           func(childComplexity int, input *model.VoteInput) int
 	}
 
+	PageInfo struct {
+		EndCursor       func(childComplexity int) int
+		HasNextPage     func(childComplexity int) int
+		HasPreviousPage func(childComplexity int) int
+		StartCursor     func(childComplexity int) int
+	}
+
 	Query struct {
 		GetUserByID func(childComplexity int, id string) int
-		GetUsers    func(childComplexity int) int
+		GetUsers    func(childComplexity int, first *int32, after *string) int
 		GetVotes    func(childComplexity int) int
 	}
 
 	User struct {
+		CreatedAt  func(childComplexity int) int
 		Email      func(childComplexity int) int
 		Id         func(childComplexity int) int
 		Reputation func(childComplexity int) int
 		Role       func(childComplexity int) int
 		Username   func(childComplexity int) int
+	}
+
+	UserConnection struct {
+		Edges    func(childComplexity int) int
+		PageInfo func(childComplexity int) int
+	}
+
+	UserEdge struct {
+		Cursor func(childComplexity int) int
+		Node   func(childComplexity int) int
 	}
 
 	UserReputation struct {
@@ -144,6 +162,34 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.Vote(childComplexity, args["input"].(*model.VoteInput)), true
 
+	case "PageInfo.endCursor":
+		if e.complexity.PageInfo.EndCursor == nil {
+			break
+		}
+
+		return e.complexity.PageInfo.EndCursor(childComplexity), true
+
+	case "PageInfo.hasNextPage":
+		if e.complexity.PageInfo.HasNextPage == nil {
+			break
+		}
+
+		return e.complexity.PageInfo.HasNextPage(childComplexity), true
+
+	case "PageInfo.hasPreviousPage":
+		if e.complexity.PageInfo.HasPreviousPage == nil {
+			break
+		}
+
+		return e.complexity.PageInfo.HasPreviousPage(childComplexity), true
+
+	case "PageInfo.startCursor":
+		if e.complexity.PageInfo.StartCursor == nil {
+			break
+		}
+
+		return e.complexity.PageInfo.StartCursor(childComplexity), true
+
 	case "Query.getUserById":
 		if e.complexity.Query.GetUserByID == nil {
 			break
@@ -161,7 +207,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		return e.complexity.Query.GetUsers(childComplexity), true
+		args, err := ec.field_Query_getUsers_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.GetUsers(childComplexity, args["first"].(*int32), args["after"].(*string)), true
 
 	case "Query.getVotes":
 		if e.complexity.Query.GetVotes == nil {
@@ -169,6 +220,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.GetVotes(childComplexity), true
+
+	case "User.createdAt":
+		if e.complexity.User.CreatedAt == nil {
+			break
+		}
+
+		return e.complexity.User.CreatedAt(childComplexity), true
 
 	case "User.email":
 		if e.complexity.User.Email == nil {
@@ -204,6 +262,34 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.User.Username(childComplexity), true
+
+	case "UserConnection.edges":
+		if e.complexity.UserConnection.Edges == nil {
+			break
+		}
+
+		return e.complexity.UserConnection.Edges(childComplexity), true
+
+	case "UserConnection.pageInfo":
+		if e.complexity.UserConnection.PageInfo == nil {
+			break
+		}
+
+		return e.complexity.UserConnection.PageInfo(childComplexity), true
+
+	case "UserEdge.cursor":
+		if e.complexity.UserEdge.Cursor == nil {
+			break
+		}
+
+		return e.complexity.UserEdge.Cursor(childComplexity), true
+
+	case "UserEdge.node":
+		if e.complexity.UserEdge.Node == nil {
+			break
+		}
+
+		return e.complexity.UserEdge.Node(childComplexity), true
 
 	case "UserReputation.badges":
 		if e.complexity.UserReputation.Badges == nil {
@@ -348,64 +434,84 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 }
 
 var sources = []*ast.Source{
-	{Name: "../Users/andrewekwugha/Documents/go-programs/social-app/internal/interaction/ports/graph/vote_schema.graphql", Input: `type Vote {
-  userId: String!
-  postId: String!
-  type: String!
-}
-
-type Query {
-  getVotes: [Vote]!
-}
-
-input VoteInput {
-  userId: String!
-  postId: String!
-  type: String!
-}
-
-type Mutation {
-  vote(input: VoteInput): Vote
+	{Name: "../base_schema.graphql", Input: `type PageInfo {
+    hasNextPage: Boolean!
+    hasPreviousPage: Boolean!
+    startCursor: String
+    endCursor: String
 }
 `, BuiltIn: false},
-	{Name: "../Users/andrewekwugha/Documents/go-programs/social-app/internal/user/ports/graph/user_schema.graphql", Input: `type User {
-    id: ID!
-    username: String!
-    email: String!
-    role: UserRole!
-    reputation: UserReputation
-}
-
-type UserReputation {
-    reputationScore: Int!
-    badges: [String!]!
-}
-
-enum UserRole {
-    REGULAR
-    MODERATOR
-    ADMIN
-}
-
-input ChangeUsername {
-    id: ID!
-    username: String!
-}
-
-input RegisterUser {
-    email: String!
-    username: String!
+	{Name: "../../../../internal/interaction/ports/graph/vote_schema.graphql", Input: `type Vote {
+    userId: String!
+    postId: String!
+    type: String!
 }
 
 extend type Query {
-    getUserById(id: ID!): User
-    getUsers: [User]!
+    getVotes: [Vote]!
+}
+
+input VoteInput {
+    userId: String!
+    postId: String!
+    type: String!
 }
 
 extend type Mutation {
-    changeUsername(input: ChangeUsername!): User
-    makeModerator(id: ID!): User
-    registerUser(input: RegisterUser!): User
+    vote(input: VoteInput): Vote
+}
+`, BuiltIn: false},
+	{Name: "../../../../internal/user/ports/graph/user_schema.graphql", Input: `scalar Time
+
+type User {
+  id: String!
+  username: String!
+  email: String!
+  role: UserRole!
+  reputation: UserReputation
+  createdAt: Time!
+}
+
+type UserEdge {
+  node: User!
+  cursor: String!
+}
+
+type UserConnection {
+  edges: [UserEdge!]!
+  pageInfo: PageInfo!
+}
+
+type UserReputation {
+  reputationScore: Int!
+  badges: [String!]!
+}
+
+enum UserRole {
+  REGULAR
+  MODERATOR
+  ADMIN
+}
+
+input ChangeUsername {
+  id: String!
+  username: String!
+}
+
+input RegisterUser {
+  email: String!
+  username: String!
+}
+
+extend type Query {
+  getUserById(id: String!): User
+  getUsers(first: Int = 10, after: String): UserConnection!
+}
+
+extend type Mutation {
+  changeUsername(input: ChangeUsername!): User
+  makeModerator(id: String!): User
+  registerUser(input: RegisterUser!): User
 }
 `, BuiltIn: false},
 }

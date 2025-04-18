@@ -6,6 +6,7 @@ import (
 	"errors"
 
 	"github.com/iammrsea/social-app/internal/shared"
+	"github.com/iammrsea/social-app/internal/shared/auth"
 	"github.com/iammrsea/social-app/internal/user/domain"
 )
 
@@ -28,6 +29,11 @@ func NewRegisterUserCommandHandler(userRepo domain.UserRepository) RegisterUserH
 }
 
 func (r *registerUserCommandHandler) Handle(ctx context.Context, cmd RegisterUserCommand) error {
+	authUser := auth.GetUserFromCtx(ctx)
+	if authUser.IsZero() {
+		return errors.New("you are already signed in")
+	}
+
 	id := rand.Text()
 	user, err := domain.NewRegularUser(id, cmd.Email, cmd.Username, nil)
 	if err != nil {

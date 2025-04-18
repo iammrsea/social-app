@@ -1,6 +1,7 @@
 # Where are all the schema files located? globs are supported eg  src/**/*.graphqls
 schema:
-  - /Users/andrewekwugha/Documents/go-programs/social-app/**/*.graphql
+  - base_schema.graphql
+  - ../../../internal/**/*_schema.graphql
 
 # Where should the generated server code go?
 exec:
@@ -118,8 +119,8 @@ call_argument_directives_with_null: true
 # gqlgen will search for any type names in the schema in these go packages
 # if they match it will use them, otherwise it will generate them.
 autobind:
- - "github.com/iammrsea/social-app/internal/user/ports/graph"
- - "github.com/iammrsea/social-app/internal/interaction/ports/graph"
+  - "github.com/iammrsea/social-app/internal/user/ports/graph"
+  - "github.com/iammrsea/social-app/internal/interaction/ports/graph"
 
 # This section declares type mapping between the GraphQL and go type systems
 #
@@ -133,7 +134,7 @@ models:
       - github.com/99designs/gqlgen/graphql.Int
       - github.com/99designs/gqlgen/graphql.Int64
       - github.com/99designs/gqlgen/graphql.Int32
-  # gqlgen provides a default GraphQL UUID convenience wrapper for github.com/google/uuid 
+  # gqlgen provides a default GraphQL UUID convenience wrapper for github.com/google/uuid
   # but you can override this to provide your own GraphQL UUID implementation
   UUID:
     model:
@@ -155,8 +156,22 @@ models:
     model:
       - github.com/99designs/gqlgen/graphql.Int
       - github.com/99designs/gqlgen/graphql.Int64
+  Time:
+    model:
+      - github.com/99designs/gqlgen/graphql.Time
+  User:
+    model:
+      - github.com/iammrsea/social-app/internal/user/domain.UserReadModel
+  UserReputation:
+    model:
+      - github.com/iammrsea/social-app/internal/user/domain.UserReputation
+  UserRole:
+    model:
+      - github.com/iammrsea/social-app/internal/user/domain.UserRole
+  PageInfo:
+    model: github.com/iammrsea/social-app/internal/shared/pagination.PageInfo
+
   # Todo:
   #   fields:
   #     user:
   #       resolver: true
-      

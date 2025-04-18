@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"slices"
+	"time"
 
 	"github.com/iammrsea/social-app/internal/user/domain"
 )
@@ -16,6 +17,7 @@ type userModel struct {
 	username   string
 	role       string
 	reputation userReputationModel
+	createdAt  time.Time
 }
 
 // simulate user_reputations table for a typical sql db
@@ -25,19 +27,19 @@ type userReputationModel struct {
 }
 
 type memoryRepository struct {
-	users []userModel
+	users []*userModel
 }
 
 func NewUserRepository(ctx context.Context) *memoryRepository {
 	return &memoryRepository{}
 }
 
-func (m *memoryRepository) GetUserById(ctx context.Context, userId string) (domain.UserReadModel, error) {
+func (m *memoryRepository) GetUserById(ctx context.Context, userId string) (*domain.UserReadModel, error) {
 	u, err := m.getUserModelById(userId)
 	if err != nil {
-		return domain.UserReadModel{}, err
+		return nil, err
 	}
-	return domain.UserReadModel{
+	return &domain.UserReadModel{
 		Username: u.username,
 		Email:    u.email,
 		Role:     u.role,
@@ -49,15 +51,15 @@ func (m *memoryRepository) GetUserById(ctx context.Context, userId string) (doma
 	}, nil
 }
 
-func (m *memoryRepository) GetUserByEmail(ctx context.Context, email string) (domain.UserReadModel, error) {
-	i := slices.IndexFunc(m.users, func(u userModel) bool {
+func (m *memoryRepository) GetUserByEmail(ctx context.Context, email string) (*domain.UserReadModel, error) {
+	i := slices.IndexFunc(m.users, func(u *userModel) bool {
 		return email == u.email
 	})
 	if i < 0 {
-		return domain.UserReadModel{}, fmt.Errorf("user with email %s does not exist", email)
+		return nil, fmt.Errorf("user with email %s does not exist", email)
 	}
 	u := m.users[i]
-	return domain.UserReadModel{
+	return &domain.UserReadModel{
 		Username: u.username,
 		Email:    u.email,
 		Role:     u.role,
@@ -69,11 +71,11 @@ func (m *memoryRepository) GetUserByEmail(ctx context.Context, email string) (do
 	}, nil
 }
 
-func (m *memoryRepository) GetUsers(ctx context.Context) ([]domain.UserReadModel, error) {
-	users := []domain.UserReadModel{}
+func (m *memoryRepository) GetUsers(ctx context.Context, opts domain.GetUsersOptions) ([]*domain.UserReadModel, bool, error) {
+	users := []*domain.UserReadModel{}
 
 	for _, user := range m.users {
-		users = append(users, domain.UserReadModel{
+		users = append(users, &domain.UserReadModel{
 			Username: user.username,
 			Email:    user.email,
 			Role:     user.role,
@@ -84,11 +86,12 @@ func (m *memoryRepository) GetUsers(ctx context.Context) ([]domain.UserReadModel
 			},
 		})
 	}
-	return users, nil
+	hasNext := false // TODO: Calculate hasNext
+	return users, hasNext, nil
 }
 
 func (m *memoryRepository) Register(ctx context.Context, user domain.User) error {
-	userExists := slices.ContainsFunc(m.users, func(u userModel) bool {
+	userExists := slices.ContainsFunc(m.users, func(u *userModel) bool {
 		return user.Email() == u.email || user.Username() == u.username
 	})
 	if userExists {
@@ -161,12 +164,13 @@ func (m *memoryRepository) ChangeUsername(ctx context.Context, userId string, up
 	return nil
 }
 
-func (m *memoryRepository) toUserModel(user *domain.User) userModel {
-	return userModel{
-		id:       user.Id(),
-		email:    user.Email(),
-		username: user.Username(),
-		role:     string(user.Role()),
+func (m *memoryRepository) toUserModel(user *domain.User) *userModel {
+	return &userModel{
+		id:        user.Id(),
+		email:     user.Email(),
+		username:  user.Username(),
+		role:      string(user.Role()),
+		createdAt: user.JoinedAt(),
 		reputation: userReputationModel{
 			reputationScore: user.ReputationScore(),
 			badges:          user.Badges(),
@@ -187,11 +191,11 @@ func (m *memoryRepository) toDomainUser(userModel *userModel) *domain.User {
 }
 
 func (m *memoryRepository) getUserModelById(userId string) (*userModel, error) {
-	i := slices.IndexFunc(m.users, func(u userModel) bool {
+	i := slices.IndexFunc(m.users, func(u *userModel) bool {
 		return userId == u.id
 	})
 	if i < 0 {
 		return nil, fmt.Errorf("user with id %s does not exist", userId)
 	}
-	return &m.users[i], nil
+	return m.users[i], nil
 }

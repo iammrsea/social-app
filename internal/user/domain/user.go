@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"slices"
 	"strings"
+	"time"
 )
 
 type User struct {
@@ -14,6 +15,7 @@ type User struct {
 	reputation *userReputation
 	role       UserRole
 	banStatus  *banning
+	joinedAt   time.Time
 }
 
 type userReputation struct {
@@ -58,7 +60,7 @@ func NewUser(id, email, username string, role UserRole, reputation *userReputati
 		}
 	}
 
-	return User{id: id, email: email, username: username, role: role, reputation: reputation, banStatus: &banning{isBanned: false}}, nil
+	return User{id: id, email: email, joinedAt: time.Now(), username: username, role: role, reputation: reputation, banStatus: &banning{isBanned: false}}, nil
 }
 
 func MustNewUser(id, email, username string, role UserRole, reputation *userReputation) User {
@@ -88,7 +90,7 @@ func NewRegularUser(id, email, username string, reputation *userReputation) (Use
 		}
 	}
 
-	return User{id: id, email: email, username: username, role: Regular, reputation: reputation, banStatus: &banning{isBanned: false}}, nil
+	return User{id: id, email: email, joinedAt: time.Now(), username: username, role: Regular, reputation: reputation, banStatus: &banning{isBanned: false}}, nil
 }
 
 func NewUserReputation(score int, badges []string) (*userReputation, error) {
@@ -120,10 +122,6 @@ func (u *User) AwardBadge(badge string) error {
 	}
 	u.reputation.badges = append(u.reputation.badges, badge)
 	return nil
-}
-
-func (u *User) IsZero() bool {
-	return u == &User{}
 }
 
 func (u *User) RevokeAwardedBadge(badge string) error {
@@ -177,4 +175,8 @@ func (u *User) ReputationScore() int {
 
 func (u *User) Badges() []string {
 	return u.reputation.badges
+}
+
+func (u *User) JoinedAt() time.Time {
+	return u.joinedAt
 }

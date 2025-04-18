@@ -1,19 +1,19 @@
 type Vote {
-  userId: String!
-  postId: String!
-  type: String!
+    userId: String!
+    postId: String!
+    type: String!
 }
 
-type Query {
-  getVotes: [Vote]!
+extend type Query {
+    getVotes: [Vote]!
 }
 
 input VoteInput {
-  userId: String!
-  postId: String!
-  type: String!
+    userId: String!
+    postId: String!
+    type: String!
 }
 
-type Mutation {
-  vote(input: VoteInput): Vote
+extend type Mutation {
+    vote(input: VoteInput): Vote
 }

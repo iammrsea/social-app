@@ -2,6 +2,11 @@
 
 package model
 
+import (
+	"github.com/iammrsea/social-app/internal/shared/pagination"
+	"github.com/iammrsea/social-app/internal/user/domain"
+)
+
 type ChangeUsername struct {
 	ID       string `json:"id"`
 	Username string `json:"username"`
@@ -16,6 +21,16 @@ type Query struct {
 type RegisterUser struct {
 	Email    string `json:"email"`
 	Username string `json:"username"`
+}
+
+type UserConnection struct {
+	Edges    []*UserEdge          `json:"edges"`
+	PageInfo *pagination.PageInfo `json:"pageInfo"`
+}
+
+type UserEdge struct {
+	Node   *domain.UserReadModel `json:"node"`
+	Cursor string                `json:"cursor"`
 }
 
 type VoteInput struct {

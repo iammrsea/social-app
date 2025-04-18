@@ -1,39 +1,52 @@
+scalar Time
+
 type User {
-    id: ID!
-    username: String!
-    email: String!
-    role: UserRole!
-    reputation: UserReputation
+  id: String!
+  username: String!
+  email: String!
+  role: UserRole!
+  reputation: UserReputation
+  createdAt: Time!
+}
+
+type UserEdge {
+  node: User!
+  cursor: String!
+}
+
+type UserConnection {
+  edges: [UserEdge!]!
+  pageInfo: PageInfo!
 }
 
 type UserReputation {
-    reputationScore: Int!
-    badges: [String!]!
+  reputationScore: Int!
+  badges: [String!]!
 }
 
 enum UserRole {
-    REGULAR
-    MODERATOR
-    ADMIN
+  REGULAR
+  MODERATOR
+  ADMIN
 }
 
 input ChangeUsername {
-    id: ID!
-    username: String!
+  id: String!
+  username: String!
 }
 
 input RegisterUser {
-    email: String!
-    username: String!
+  email: String!
+  username: String!
 }
 
 extend type Query {
-    getUserById(id: ID!): User
-    getUsers: [User]!
+  getUserById(id: String!): User
+  getUsers(first: Int = 10, after: String): UserConnection!
 }
 
 extend type Mutation {
-    changeUsername(input: ChangeUsername!): User
-    makeModerator(id: ID!): User
-    registerUser(input: RegisterUser!): User
+  changeUsername(input: ChangeUsername!): User
+  makeModerator(id: String!): User
+  registerUser(input: RegisterUser!): User
 }

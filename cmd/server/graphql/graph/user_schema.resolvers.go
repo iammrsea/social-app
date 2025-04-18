@@ -7,21 +7,21 @@ package graph
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/iammrsea/social-app/cmd/server/graphql/graph/model"
+	"github.com/iammrsea/social-app/internal/shared/pagination"
+	"github.com/iammrsea/social-app/internal/user/app/query"
 	"github.com/iammrsea/social-app/internal/user/domain"
 )
 
 // ChangeUsername is the resolver for the changeUsername field.
 func (r *mutationResolver) ChangeUsername(ctx context.Context, input model.ChangeUsername) (*domain.UserReadModel, error) {
-	// r.userService.AwardBadgeHandler.Handle(ctx context.Context, cmd command.AwardBadgeCommand)
-
 	panic(fmt.Errorf("not implemented: ChangeUsername - changeUsername"))
 }
 
 // MakeModerator is the resolver for the makeModerator field.
 func (r *mutationResolver) MakeModerator(ctx context.Context, id string) (*domain.UserReadModel, error) {
-	// r.Services.UserService.AwardBadgeHandler.Handle()
 	panic(fmt.Errorf("not implemented: MakeModerator - makeModerator"))
 }
 
@@ -36,8 +36,55 @@ func (r *queryResolver) GetUserByID(ctx context.Context, id string) (*domain.Use
 }
 
 // GetUsers is the resolver for the getUsers field.
-func (r *queryResolver) GetUsers(ctx context.Context) ([]*domain.UserReadModel, error) {
-	panic(fmt.Errorf("not implemented: GetUsers - getUsers"))
+func (r *queryResolver) GetUsers(ctx context.Context, first *int32, after *string) (*model.UserConnection, error) {
+	var limit int32 = 10
+	if first != nil {
+		limit = *first
+	}
+	var afterCursor string
+
+	if after != nil {
+		decoded, err := pagination.DecodeCursor(*after)
+		if err == nil {
+			afterCursor = decoded
+		}
+	}
+
+	result, err := r.Services.UserService.GetUsersHandler.Handle(ctx, query.GetUsersCommand{After: afterCursor, First: limit})
+
+	if err != nil {
+		return nil, err
+	}
+
+	if len(result.Data) == 0 {
+		return &model.UserConnection{
+			Edges:    []*model.UserEdge{},
+			PageInfo: &pagination.PageInfo{},
+		}, nil
+	}
+
+	edges := make([]*model.UserEdge, len(result.Data))
+
+	for i, user := range result.Data {
+		cursor := user.CreatedAt.UTC().Format(time.RFC3339Nano)
+		edges[i] = &model.UserEdge{
+			Cursor: pagination.EncodeCursor(cursor),
+			Node:   user,
+		}
+	}
+
+	startCursor := edges[0].Cursor
+	endCursor := edges[len(edges)-1].Cursor
+
+	return &model.UserConnection{
+		Edges: edges,
+		PageInfo: &pagination.PageInfo{
+			HasNextPage:     result.PaginationInfo.HasNext,
+			HasPreviousPage: afterCursor != "",
+			StartCursor:     startCursor,
+			EndCursor:       endCursor,
+		},
+	}, nil
 }
 
 // Role is the resolver for the role field.

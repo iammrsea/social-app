@@ -2,21 +2,30 @@ package auth
 
 import (
 	"context"
-	"errors"
 	"net/http"
 	"strings"
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/iammrsea/social-app/internal/shared/config"
+	"github.com/iammrsea/social-app/internal/user/domain"
 )
 
 type contextKey int
 
 const userCtxKey contextKey = iota
 
-type Authenticateduser struct {
+type AuthenticatedUser struct {
 	Email string
 	Id    string
+	Role  domain.UserRole
+}
+
+func (a *AuthenticatedUser) IsZero() bool {
+	return *a == AuthenticatedUser{}
+}
+
+func (a *AuthenticatedUser) IsAuthenticated() bool {
+	return !a.IsZero()
 }
 
 func AuthMiddleware(next http.Handler) http.Handler {
@@ -27,14 +36,14 @@ func AuthMiddleware(next http.Handler) http.Handler {
 			next.ServeHTTP(w, r.WithContext(ctx))
 			return
 		}
-		claims, err := ParseTokenFromRequest(r)
+		claims := ParseTokenFromRequest(r)
 
-		if err != nil {
-			http.Error(w, "unauthorized", http.StatusUnauthorized)
-			return
-		}
-		user := &Authenticateduser{
-			Email: claims.Email,
+		user := &AuthenticatedUser{}
+
+		if !claims.IsZero() {
+			user.Email = claims.Email
+			user.Id = claims.UserId
+			user.Role = claims.Role
 		}
 
 		ctx := context.WithValue(r.Context(), userCtxKey, user)
@@ -43,21 +52,27 @@ func AuthMiddleware(next http.Handler) http.Handler {
 }
 
 type AuthClaims struct {
-	UserId string `json:"sub"`
-	Email  string `json:"email"`
+	UserId string          `json:"sub"`
+	Email  string          `json:"email"`
+	Role   domain.UserRole `json:"role"`
 	jwt.RegisteredClaims
 }
 
-func ParseTokenFromRequest(r *http.Request) (*AuthClaims, error) {
+func (c *AuthClaims) IsZero() bool {
+	return c.Email == "" || c.UserId == "" || c.Role == ""
+}
+
+func ParseTokenFromRequest(r *http.Request) *AuthClaims {
 	authHeader := r.Header.Get("Authorization")
+	zeroClaims := &AuthClaims{}
 
 	if strings.TrimSpace(authHeader) == "" {
-		return nil, errors.New("missing Authorization header")
+		return zeroClaims
 	}
 
 	parts := strings.Split(authHeader, "Bearer ")
 	if len(parts) != 2 {
-		return nil, errors.New("invalid Authorization header")
+		return zeroClaims
 	}
 
 	bearerToken := parts[1]
@@ -69,14 +84,19 @@ func ParseTokenFromRequest(r *http.Request) (*AuthClaims, error) {
 	})
 
 	if err != nil || !token.Valid {
-		return nil, errors.New("invalid token")
+		return zeroClaims
 	}
 
 	claims, ok := token.Claims.(*AuthClaims)
 
 	if !ok {
-		return nil, errors.New("invalid claims")
+		return zeroClaims
 	}
 
-	return claims, nil
+	return claims
+}
+
+func GetUserFromCtx(ctx context.Context) *AuthenticatedUser {
+	user, _ := ctx.Value(userCtxKey).(*AuthenticatedUser)
+	return user
 }

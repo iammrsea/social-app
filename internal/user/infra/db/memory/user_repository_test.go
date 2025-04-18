@@ -268,8 +268,9 @@ func TestGetUsers(t *testing.T) {
 	err := memRepo.Register(ctx, user)
 	assert.Nil(t, err)
 
-	users, err := memRepo.GetUsers(ctx)
+	users, hasNext, err := memRepo.GetUsers(ctx, domain.GetUsersOptions{})
 	assert.Nil(t, err)
+	assert.False(t, hasNext)
 	assert.Equal(t, []domain.UserReadModel{userDomainToUserReadModel(user)}, users)
 }
 

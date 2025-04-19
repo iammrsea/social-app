@@ -22,15 +22,19 @@ const (
 type ENV_VARIABLE string
 
 const (
-	AUTH_SECRET ENV_VARIABLE = "AUTH_SECRET"
-	GO_ENV      ENV_VARIABLE = "GO_ENV"
-	PORT        ENV_VARIABLE = "PORT"
+	AUTH_SECRET  ENV_VARIABLE = "AUTH_SECRET"
+	GO_ENV       ENV_VARIABLE = "GO_ENV"
+	PORT         ENV_VARIABLE = "PORT"
+	MONGODB_URI  ENV_VARIABLE = "MONGODB_URI"
+	MONGODB_NAME ENV_VARIABLE = "MONGODB_NAME"
 )
 
 type env struct {
-	authSecret string
-	goEnv      Environment
-	port       string
+	authSecret  string
+	goEnv       Environment
+	port        string
+	mongoDbURI  string
+	mongoDbName string
 }
 
 func (e *env) AuthSecret() string {
@@ -39,6 +43,13 @@ func (e *env) AuthSecret() string {
 
 func (e *env) GoEnv() Environment {
 	return e.goEnv
+}
+
+func (e *env) MongoDbURI() string {
+	return e.mongoDbURI
+}
+func (e *env) MongoDbName() string {
+	return e.mongoDbName
 }
 
 func (e *env) Port() string {
@@ -67,15 +78,25 @@ func Env() *env {
 		panic(fmt.Sprintf("%s environment variable is not set", GO_ENV))
 	}
 	port := getEnv(PORT)
+	mongoURI := getEnv(MONGODB_URI)
+	if strings.TrimSpace(mongoURI) == "" {
+		panic(fmt.Sprintf("%s environment variable is not set", MONGODB_URI))
+	}
+	mongoName := getEnv(MONGODB_NAME)
+	if strings.TrimSpace(mongoURI) == "" {
+		panic(fmt.Sprintf("%s environment variable is not set", MONGODB_NAME))
+	}
 
 	if strings.TrimSpace(port) == "" {
 		port = DEFAULT_PORT
 	}
 
 	return &env{
-		authSecret: authSecret,
-		goEnv:      Environment(goEnv),
-		port:       port,
+		authSecret:  authSecret,
+		goEnv:       Environment(goEnv),
+		port:        port,
+		mongoDbURI:  mongoURI,
+		mongoDbName: mongoName,
 	}
 }
 

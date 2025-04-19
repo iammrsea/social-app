@@ -110,5 +110,9 @@ func mustBan(user *domain.User) {
 }
 
 func createUser() domain.User {
-	return domain.MustNewUser("user-id", "example@gmail.com", "john-doe", domain.Regular, nil)
+	return domain.MustNewUser("user-id", "example@gmail.com",
+		"john-doe", domain.Regular,
+		time.Now(),
+		time.Now(),
+		nil)
 }

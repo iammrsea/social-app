@@ -12,6 +12,8 @@ import (
 	"github.com/iammrsea/social-app/internal"
 	"github.com/iammrsea/social-app/internal/shared/auth"
 	"github.com/iammrsea/social-app/internal/shared/config"
+	"github.com/iammrsea/social-app/internal/shared/config/db"
+	"github.com/iammrsea/social-app/internal/user/infra/db/mongodb"
 	"github.com/iammrsea/social-app/internal/user/service"
 )
 
@@ -34,8 +36,19 @@ func main() {
 
 	ctx := context.Background()
 
+	// Use any database of choice
+	mongoDbConfig := db.NewMongoConfig()
+	client, mongoDatabase, err := db.Connect(ctx, mongoDbConfig)
+	if err != nil {
+		log.Fatalf("Failed to connect to MongoDB: %v", err)
+	}
+	defer db.Disconnect(ctx, client)
+
+	// Create repositories
+	userRepo := mongodb.NewUserRepository(mongoDatabase)
+	userReadModelRepo := mongodb.NewUserReadModelRepository(mongoDatabase)
 	services := &internal.Services{
-		UserService: service.NewUserService(ctx),
+		UserService: service.NewUserService(userRepo, userReadModelRepo),
 	}
 
 	graphql.SetupHttGraphQLServer(router, services)

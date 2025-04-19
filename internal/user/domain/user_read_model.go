@@ -8,10 +8,11 @@ type UserReadModel struct {
 	Role       UserRole       `json:"role"`
 	Id         string         `json:"id"`
 	Reputation UserReputation `json:"reputation"`
-	CreatedAt  time.Time      `json:"created_at"`
+	CreatedAt  time.Time      `json:"createtAt"`
+	UpdatedAt  time.Time      `json:"createdAt"`
 }
 
 type UserReputation struct {
-	ReputationScore int      `json:"reputation_score"`
+	ReputationScore int      `json:"reputationScore"`
 	Badges          []string `json:"badges"`
 }

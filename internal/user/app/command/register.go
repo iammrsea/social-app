@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/rand"
 	"errors"
+	"time"
 
 	"github.com/iammrsea/social-app/internal/shared"
 	"github.com/iammrsea/social-app/internal/shared/auth"
@@ -35,7 +36,12 @@ func (r *registerUserCommandHandler) Handle(ctx context.Context, cmd RegisterUse
 	}
 
 	id := rand.Text()
-	user, err := domain.NewRegularUser(id, cmd.Email, cmd.Username, nil)
+	user, err := domain.NewUser(id,
+		cmd.Email, cmd.Username,
+		domain.Regular,
+		time.Now(),
+		time.Now(),
+		nil)
 	if err != nil {
 		return errors.Unwrap(err)
 	}

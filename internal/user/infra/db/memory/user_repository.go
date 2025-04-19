@@ -18,6 +18,7 @@ type userModel struct {
 	role       string
 	reputation userReputationModel
 	createdAt  time.Time
+	updatedAt  time.Time
 }
 
 // simulate user_reputations table for a typical sql db
@@ -184,6 +185,8 @@ func (m *memoryRepository) toDomainUser(userModel *userModel) *domain.User {
 		userModel.email,
 		userModel.username,
 		domain.UserRole(userModel.role),
+		userModel.createdAt,
+		userModel.updatedAt,
 		domain.MustNewUserReputation(userModel.reputation.reputationScore, userModel.reputation.badges),
 	)
 

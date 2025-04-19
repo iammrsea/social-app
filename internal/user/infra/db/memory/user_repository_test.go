@@ -4,6 +4,7 @@ import (
 	"context"
 	"slices"
 	"testing"
+	"time"
 
 	"github.com/iammrsea/social-app/internal/user/domain"
 	"github.com/iammrsea/social-app/internal/user/infra/db/memory"
@@ -15,7 +16,11 @@ func TestRegister(t *testing.T) {
 
 	t.Run("should be able to register user", func(t *testing.T) {
 		t.Parallel()
-		user := domain.MustNewUser("user-id", "johndoe@gmail.com", "johndoe", domain.Regular, nil)
+		user := domain.MustNewUser("user-id", "johndoe@gmail.com",
+			"johndoe", domain.Regular,
+			time.Now(),
+			time.Now(),
+			nil)
 
 		memRepo := memory.NewUserRepository(context.Background())
 
@@ -33,7 +38,9 @@ func TestRegister(t *testing.T) {
 	t.Run("should return correct error if user already exists", func(t *testing.T) {
 		t.Parallel()
 
-		user := domain.MustNewUser("user-id", "johndoe@gmail.com", "johndoe", domain.Regular, nil)
+		user := domain.MustNewUser("user-id", "johndoe@gmail.com", "johndoe", domain.Regular,
+			time.Now(),
+			time.Now(), nil)
 
 		memRepo := memory.NewUserRepository(context.Background())
 
@@ -55,7 +62,9 @@ func TestMakeModerator(t *testing.T) {
 	t.Run("should be able to make user moderator", func(t *testing.T) {
 		t.Parallel()
 
-		user := domain.MustNewUser("user-id", "johndoe@gmail.com", "johndoe", domain.Regular, nil)
+		user := domain.MustNewUser("user-id", "johndoe@gmail.com", "johndoe", domain.Regular,
+			time.Now(),
+			time.Now(), nil)
 
 		memRepo := memory.NewUserRepository(context.Background())
 
@@ -97,7 +106,9 @@ func TestAwardBadge(t *testing.T) {
 	t.Run("should be able to award badge to user", func(t *testing.T) {
 		t.Parallel()
 
-		user := domain.MustNewUser("user-id", "johndoe@gmail.com", "johndoe", domain.Regular, nil)
+		user := domain.MustNewUser("user-id", "johndoe@gmail.com", "johndoe", domain.Regular,
+			time.Now(),
+			time.Now(), nil)
 
 		memRepo := memory.NewUserRepository(context.Background())
 
@@ -139,7 +150,9 @@ func TestRevokeAwardedBadge(t *testing.T) {
 	t.Run("should be able to revoke badge from user", func(t *testing.T) {
 		t.Parallel()
 
-		user := domain.MustNewUser("user-id", "johndoe@gmail.com", "johndoe", domain.Regular, nil)
+		user := domain.MustNewUser("user-id", "johndoe@gmail.com", "johndoe", domain.Regular,
+			time.Now(),
+			time.Now(), nil)
 
 		memRepo := memory.NewUserRepository(context.Background())
 
@@ -188,7 +201,8 @@ func TestChangeUsername(t *testing.T) {
 	t.Run("should be able to change username", func(t *testing.T) {
 		t.Parallel()
 
-		user := domain.MustNewUser("user-id", "johndoe@gmail.com", "johndoe", domain.Regular, nil)
+		user := domain.MustNewUser("user-id", "johndoe@gmail.com", "johndoe", domain.Regular, time.Now(),
+			time.Now(), nil)
 
 		memRepo := memory.NewUserRepository(context.Background())
 
@@ -230,7 +244,9 @@ func TestGetUserById(t *testing.T) {
 	t.Run("should be able to get user by id", func(t *testing.T) {
 		t.Parallel()
 
-		user := domain.MustNewUser("user-id", "johndoe@gmail.com", "johndoe", domain.Regular, nil)
+		user := domain.MustNewUser("user-id", "johndoe@gmail.com", "johndoe", domain.Regular,
+			time.Now(),
+			time.Now(), nil)
 
 		memRepo := memory.NewUserRepository(context.Background())
 
@@ -264,7 +280,9 @@ func TestGetUsers(t *testing.T) {
 	memRepo := memory.NewUserRepository(context.Background())
 
 	ctx := context.Background()
-	user := domain.MustNewUser("user-id", "johndoe@gmail.com", "johndoe", domain.Regular, nil)
+	user := domain.MustNewUser("user-id", "johndoe@gmail.com", "johndoe", domain.Regular,
+		time.Now(),
+		time.Now(), nil)
 	err := memRepo.Register(ctx, user)
 	assert.Nil(t, err)
 
@@ -283,7 +301,11 @@ func TestGetUserByEmail(t *testing.T) {
 		memRepo := memory.NewUserRepository(context.Background())
 
 		ctx := context.Background()
-		user := domain.MustNewUser("user-id", "johndoe@gmail.com", "johndoe", domain.Regular, nil)
+		user := domain.MustNewUser("user-id", "johndoe@gmail.com",
+			"johndoe", domain.Regular,
+			time.Now(),
+			time.Now(),
+			nil)
 		err := memRepo.Register(ctx, user)
 		assert.Nil(t, err)
 

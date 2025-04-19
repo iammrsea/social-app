@@ -16,6 +16,7 @@ type User struct {
 	role       UserRole
 	banStatus  *banning
 	joinedAt   time.Time
+	updatedAt  time.Time
 }
 
 type userReputation struct {
@@ -33,9 +34,11 @@ var (
 	ErrInvalidIncrementValue = errors.New("you cannot increment user reputation by a value less than one")
 	ErrInvalidDecrementValue = errors.New("you cannot decrement user reputation by a value less than one")
 	ErrInvalidRepScore       = errors.New("invalid reputation score")
+	ErrEmailAlreadyExists    = errors.New("email already exists")
+	ErrUserNotFound          = errors.New("user not found")
 )
 
-func NewUser(id, email, username string, role UserRole, reputation *userReputation) (User, error) {
+func NewUser(id, email, username string, role UserRole, joinedAt time.Time, updatedAt time.Time, reputation *userReputation) (User, error) {
 	user := User{}
 	if strings.TrimSpace(id) == "" {
 		return user, ErrUserIdRequired
@@ -60,18 +63,18 @@ func NewUser(id, email, username string, role UserRole, reputation *userReputati
 		}
 	}
 
-	return User{id: id, email: email, joinedAt: time.Now(), username: username, role: role, reputation: reputation, banStatus: &banning{isBanned: false}}, nil
+	return User{id: id, email: email, joinedAt: joinedAt, updatedAt: updatedAt, username: username, role: role, reputation: reputation, banStatus: &banning{isBanned: false}}, nil
 }
 
-func MustNewUser(id, email, username string, role UserRole, reputation *userReputation) User {
-	user, err := NewUser(id, email, username, role, reputation)
+func MustNewUser(id, email, username string, role UserRole, joinedAt time.Time, updatedAt time.Time, reputation *userReputation) User {
+	user, err := NewUser(id, email, username, role, joinedAt, updatedAt, reputation)
 	if err != nil {
 		panic(err.Error())
 	}
 	return user
 }
 
-func NewRegularUser(id, email, username string, reputation *userReputation) (User, error) {
+func newRegularUser(id, email, username string, reputation *userReputation) (User, error) {
 	user := User{}
 	if strings.TrimSpace(id) == "" {
 		return user, ErrUserIdRequired
@@ -90,7 +93,7 @@ func NewRegularUser(id, email, username string, reputation *userReputation) (Use
 		}
 	}
 
-	return User{id: id, email: email, joinedAt: time.Now(), username: username, role: Regular, reputation: reputation, banStatus: &banning{isBanned: false}}, nil
+	return User{id: id, email: email, joinedAt: time.Now(), updatedAt: time.Now(), username: username, role: Regular, reputation: reputation, banStatus: &banning{isBanned: false}}, nil
 }
 
 func NewUserReputation(score int, badges []string) (*userReputation, error) {
@@ -113,6 +116,7 @@ func (u *User) ChangeUsername(newUsername string) error {
 		return ErrUsernameRequired
 	}
 	u.username = newUsername
+	u.updatedAt = time.Now()
 	return nil
 }
 
@@ -121,6 +125,7 @@ func (u *User) AwardBadge(badge string) error {
 		return ErrBadgeRequired
 	}
 	u.reputation.badges = append(u.reputation.badges, badge)
+	u.updatedAt = time.Now()
 	return nil
 }
 
@@ -138,6 +143,7 @@ func (u *User) RevokeAwardedBadge(badge string) error {
 	u.reputation.badges = slices.DeleteFunc(badges, func(awardedBadge string) bool {
 		return awardedBadge == badge
 	})
+	u.updatedAt = time.Now()
 	return nil
 }
 
@@ -146,6 +152,7 @@ func (u *User) IncrementReputationScoreBy(v int) error {
 		return ErrInvalidIncrementValue
 	}
 	u.reputation.reputationScore = u.reputation.reputationScore + v
+	u.updatedAt = time.Now()
 	return nil
 }
 
@@ -154,6 +161,7 @@ func (u *User) DecrementReputationScoreBy(v int) error {
 		return ErrInvalidDecrementValue
 	}
 	u.reputation.reputationScore = u.reputation.reputationScore - v
+	u.updatedAt = time.Now()
 	return nil
 }
 
@@ -179,4 +187,8 @@ func (u *User) Badges() []string {
 
 func (u *User) JoinedAt() time.Time {
 	return u.joinedAt
+}
+
+func (u *User) UpdatedAt() time.Time {
+	return u.updatedAt
 }

@@ -35,7 +35,6 @@ type Config struct {
 type ResolverRoot interface {
 	Mutation() MutationResolver
 	Query() QueryResolver
-	User() UserResolver
 	UserReputation() UserReputationResolver
 	Vote() VoteResolver
 }
@@ -70,6 +69,7 @@ type ComplexityRoot struct {
 		Id         func(childComplexity int) int
 		Reputation func(childComplexity int) int
 		Role       func(childComplexity int) int
+		UpdatedAt  func(childComplexity int) int
 		Username   func(childComplexity int) int
 	}
 
@@ -255,6 +255,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.User.Role(childComplexity), true
+
+	case "User.updatedAt":
+		if e.complexity.User.UpdatedAt == nil {
+			break
+		}
+
+		return e.complexity.User.UpdatedAt(childComplexity), true
 
 	case "User.username":
 		if e.complexity.User.Username == nil {
@@ -464,54 +471,55 @@ extend type Mutation {
 	{Name: "../../../../internal/user/ports/graph/user_schema.graphql", Input: `scalar Time
 
 type User {
-  id: String!
-  username: String!
-  email: String!
-  role: UserRole!
-  reputation: UserReputation
-  createdAt: Time!
+    id: String!
+    username: String!
+    email: String!
+    role: UserRole!
+    reputation: UserReputation
+    createdAt: Time!
+    updatedAt: Time!
 }
 
 type UserEdge {
-  node: User!
-  cursor: String!
+    node: User!
+    cursor: String!
 }
 
 type UserConnection {
-  edges: [UserEdge!]!
-  pageInfo: PageInfo!
+    edges: [UserEdge!]!
+    pageInfo: PageInfo!
 }
 
 type UserReputation {
-  reputationScore: Int!
-  badges: [String!]!
+    reputationScore: Int!
+    badges: [String!]!
 }
 
 enum UserRole {
-  REGULAR
-  MODERATOR
-  ADMIN
+    REGULAR
+    MODERATOR
+    ADMIN
 }
 
 input ChangeUsername {
-  id: String!
-  username: String!
+    id: String!
+    username: String!
 }
 
 input RegisterUser {
-  email: String!
-  username: String!
+    email: String!
+    username: String!
 }
 
 extend type Query {
-  getUserById(id: String!): User
-  getUsers(first: Int = 10, after: String): UserConnection!
+    getUserById(id: String!): User
+    getUsers(first: Int = 10, after: String): UserConnection!
 }
 
 extend type Mutation {
-  changeUsername(input: ChangeUsername!): User
-  makeModerator(id: String!): User
-  registerUser(input: RegisterUser!): User
+    changeUsername(input: ChangeUsername!): User
+    makeModerator(id: String!): User
+    registerUser(input: RegisterUser!): User
 }
 `, BuiltIn: false},
 }

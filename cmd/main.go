@@ -37,16 +37,13 @@ func main() {
 	ctx := context.Background()
 
 	// Use any database of choice
-	mongoDbConfig := db.NewMongoConfig()
-	client, mongoDatabase, err := db.Connect(ctx, mongoDbConfig)
-	if err != nil {
-		log.Fatalf("Failed to connect to MongoDB: %v", err)
-	}
-	defer db.Disconnect(ctx, client)
+	mongoDB, closeConnection := db.SetupMongoDB(ctx)
+
+	defer closeConnection()
 
 	// Create repositories
-	userRepo := mongodb.NewUserRepository(mongoDatabase)
-	userReadModelRepo := mongodb.NewUserReadModelRepository(mongoDatabase)
+	userRepo := mongodb.NewUserRepository(mongoDB)
+	userReadModelRepo := mongodb.NewUserReadModelRepository(mongoDB)
 	services := &internal.Services{
 		UserService: service.NewUserService(userRepo, userReadModelRepo),
 	}

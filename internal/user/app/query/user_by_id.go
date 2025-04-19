@@ -38,7 +38,7 @@ func (g *getUserByIdCommandHandler) Handle(ctx context.Context, cmd GetUserByIdC
 	user, err := g.queryRepo.GetUserById(ctx, cmd.Id)
 
 	if err != nil {
-		return nil, errors.Unwrap(err)
+		return nil, err
 	}
 	return user, nil
 }

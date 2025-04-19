@@ -38,7 +38,7 @@ func (g *getUsersCommandHandler) Handle(ctx context.Context, cmd GetUsersCommand
 	users, hasNext, err := g.queryRepo.GetUsers(ctx, cmd)
 
 	if err != nil {
-		return nil, errors.Unwrap(err)
+		return nil, err
 	}
 	result := &Result{
 		Data: users,

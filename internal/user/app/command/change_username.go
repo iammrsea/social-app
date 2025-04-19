@@ -38,12 +38,12 @@ func (c *changeUsernameCommandHandler) Handle(ctx context.Context, cmd ChangeUse
 	err := c.userRepo.ChangeUsername(ctx, cmd.Id, func(user *domain.User) (*domain.User, error) {
 		err := user.ChangeUsername(cmd.Username)
 		if err != nil {
-			return nil, errors.Unwrap(err)
+			return nil, err
 		}
 		return user, nil
 	})
 	if err != nil {
-		return errors.Unwrap(err)
+		return err
 	}
 	return nil
 }

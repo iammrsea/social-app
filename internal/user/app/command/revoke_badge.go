@@ -39,13 +39,13 @@ func (r *revokeAwardedBagdeCommandHandler) Handle(ctx context.Context, cmd Revok
 	err := r.userRepo.RevokeAwardedBadge(ctx, cmd.Id, func(user *domain.User) (*domain.User, error) {
 		err := user.RevokeAwardedBadge(cmd.Badge)
 		if err != nil {
-			return nil, errors.Unwrap(err)
+			return nil, err
 		}
 		return user, nil
 	})
 
 	if err != nil {
-		return errors.Unwrap(err)
+		return err
 	}
 
 	return nil

@@ -43,7 +43,7 @@ func (r *makeModeratorCommandHandler) Handle(ctx context.Context, cmd MakeModera
 	})
 
 	if err != nil {
-		return errors.Unwrap(err)
+		return err
 	}
 
 	return nil

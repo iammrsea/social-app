@@ -43,13 +43,13 @@ func (r *registerUserCommandHandler) Handle(ctx context.Context, cmd RegisterUse
 		time.Now(),
 		nil)
 	if err != nil {
-		return errors.Unwrap(err)
+		return err
 	}
 
 	err = r.userRepo.Register(ctx, user)
 
 	if err != nil {
-		return errors.Unwrap(err)
+		return err
 	}
 
 	return nil

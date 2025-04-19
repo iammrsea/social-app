@@ -38,7 +38,7 @@ func (g *getUserByEmailCommandHandler) Handle(ctx context.Context, cmd GetUserBy
 	user, err := g.queryRepo.GetUserByEmail(ctx, cmd.Email)
 
 	if err != nil {
-		return nil, errors.Unwrap(err)
+		return nil, err
 	}
 	return user, nil
 }

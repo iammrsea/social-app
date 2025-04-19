@@ -115,21 +115,26 @@ func (r *queryResolver) GetUsers(ctx context.Context, first *int32, after *strin
 	}, nil
 }
 
-// Role is the resolver for the role field.
-func (r *userResolver) Role(ctx context.Context, obj *domain.UserReadModel) (domain.UserRole, error) {
-	return obj.Role, nil
-}
-
 // ReputationScore is the resolver for the reputationScore field.
 func (r *userReputationResolver) ReputationScore(ctx context.Context, obj *domain.UserReputation) (int32, error) {
 	return int32(obj.ReputationScore), nil
 }
 
-// User returns UserResolver implementation.
-func (r *Resolver) User() UserResolver { return &userResolver{r} }
-
 // UserReputation returns UserReputationResolver implementation.
 func (r *Resolver) UserReputation() UserReputationResolver { return &userReputationResolver{r} }
 
-type userResolver struct{ *Resolver }
 type userReputationResolver struct{ *Resolver }
+
+// !!! WARNING !!!
+// The code below was going to be deleted when updating resolvers. It has been copied here so you have
+// one last chance to move it out of harms way if you want. There are two reasons this happens:
+//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
+//    it when you're done.
+//  - You have helper methods in this file. Move them out to keep these resolver files clean.
+/*
+	func (r *userResolver) Role(ctx context.Context, obj *domain.UserReadModel) (domain.UserRole, error) {
+	return obj.Role, nil
+}
+func (r *Resolver) User() UserResolver { return &userResolver{r} }
+type userResolver struct{ *Resolver }
+*/

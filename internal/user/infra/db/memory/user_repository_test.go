@@ -6,6 +6,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/iammrsea/social-app/internal/shared/rbac"
 	"github.com/iammrsea/social-app/internal/user/domain"
 	"github.com/iammrsea/social-app/internal/user/infra/db/memory"
 	"github.com/stretchr/testify/assert"
@@ -17,7 +18,7 @@ func TestRegister(t *testing.T) {
 	t.Run("should be able to register user", func(t *testing.T) {
 		t.Parallel()
 		user := domain.MustNewUser("user-id", "johndoe@gmail.com",
-			"johndoe", domain.Regular,
+			"johndoe", rbac.Regular,
 			time.Now(),
 			time.Now(),
 			nil)
@@ -38,7 +39,7 @@ func TestRegister(t *testing.T) {
 	t.Run("should return correct error if user already exists", func(t *testing.T) {
 		t.Parallel()
 
-		user := domain.MustNewUser("user-id", "johndoe@gmail.com", "johndoe", domain.Regular,
+		user := domain.MustNewUser("user-id", "johndoe@gmail.com", "johndoe", rbac.Regular,
 			time.Now(),
 			time.Now(), nil)
 
@@ -62,7 +63,7 @@ func TestMakeModerator(t *testing.T) {
 	t.Run("should be able to make user moderator", func(t *testing.T) {
 		t.Parallel()
 
-		user := domain.MustNewUser("user-id", "johndoe@gmail.com", "johndoe", domain.Regular,
+		user := domain.MustNewUser("user-id", "johndoe@gmail.com", "johndoe", rbac.Regular,
 			time.Now(),
 			time.Now(), nil)
 
@@ -81,7 +82,7 @@ func TestMakeModerator(t *testing.T) {
 
 		savedUser, err := memRepo.GetUserById(ctx, user.Id())
 		assert.Nil(t, err)
-		assert.Equal(t, savedUser.Role, domain.Moderator.String())
+		assert.Equal(t, savedUser.Role, rbac.Moderator.String())
 	})
 
 	t.Run("should return correct error if user does not exist", func(t *testing.T) {
@@ -106,7 +107,7 @@ func TestAwardBadge(t *testing.T) {
 	t.Run("should be able to award badge to user", func(t *testing.T) {
 		t.Parallel()
 
-		user := domain.MustNewUser("user-id", "johndoe@gmail.com", "johndoe", domain.Regular,
+		user := domain.MustNewUser("user-id", "johndoe@gmail.com", "johndoe", rbac.Regular,
 			time.Now(),
 			time.Now(), nil)
 
@@ -150,7 +151,7 @@ func TestRevokeAwardedBadge(t *testing.T) {
 	t.Run("should be able to revoke badge from user", func(t *testing.T) {
 		t.Parallel()
 
-		user := domain.MustNewUser("user-id", "johndoe@gmail.com", "johndoe", domain.Regular,
+		user := domain.MustNewUser("user-id", "johndoe@gmail.com", "johndoe", rbac.Regular,
 			time.Now(),
 			time.Now(), nil)
 
@@ -201,7 +202,7 @@ func TestChangeUsername(t *testing.T) {
 	t.Run("should be able to change username", func(t *testing.T) {
 		t.Parallel()
 
-		user := domain.MustNewUser("user-id", "johndoe@gmail.com", "johndoe", domain.Regular, time.Now(),
+		user := domain.MustNewUser("user-id", "johndoe@gmail.com", "johndoe", rbac.Regular, time.Now(),
 			time.Now(), nil)
 
 		memRepo := memory.NewUserRepository(context.Background())
@@ -244,7 +245,7 @@ func TestGetUserById(t *testing.T) {
 	t.Run("should be able to get user by id", func(t *testing.T) {
 		t.Parallel()
 
-		user := domain.MustNewUser("user-id", "johndoe@gmail.com", "johndoe", domain.Regular,
+		user := domain.MustNewUser("user-id", "johndoe@gmail.com", "johndoe", rbac.Regular,
 			time.Now(),
 			time.Now(), nil)
 
@@ -280,7 +281,7 @@ func TestGetUsers(t *testing.T) {
 	memRepo := memory.NewUserRepository(context.Background())
 
 	ctx := context.Background()
-	user := domain.MustNewUser("user-id", "johndoe@gmail.com", "johndoe", domain.Regular,
+	user := domain.MustNewUser("user-id", "johndoe@gmail.com", "johndoe", rbac.Regular,
 		time.Now(),
 		time.Now(), nil)
 	err := memRepo.Register(ctx, user)
@@ -302,7 +303,7 @@ func TestGetUserByEmail(t *testing.T) {
 
 		ctx := context.Background()
 		user := domain.MustNewUser("user-id", "johndoe@gmail.com",
-			"johndoe", domain.Regular,
+			"johndoe", rbac.Regular,
 			time.Now(),
 			time.Now(),
 			nil)

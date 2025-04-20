@@ -16,16 +16,19 @@ type mongoConfig struct {
 	uri          string
 	databaseName string
 	timeout      time.Duration
+	replicaSet   string
 }
 
 // SetupMongoDB sets up and connects to MongoDB
 func SetupMongoDB(ctx context.Context) (*mongo.Database, func() error) {
 	uri := config.Env().MongoDbURI()
 	dbName := config.Env().MongoDbName()
-	mongoConfig := mongoConfig{
+	replicaSet := config.Env().MongoDbReplicaSet()
+	mongoConfig := &mongoConfig{
 		uri:          uri,
 		databaseName: dbName,
 		timeout:      10 * time.Second,
+		replicaSet:   replicaSet,
 	}
 	client, db, err := connect(ctx, mongoConfig)
 	if err != nil {
@@ -40,7 +43,7 @@ func SetupMongoDB(ctx context.Context) (*mongo.Database, func() error) {
 }
 
 // connect establishes a connection to MongoDB and returns the client and database
-func connect(ctx context.Context, config mongoConfig) (*mongo.Client, *mongo.Database, error) {
+func connect(ctx context.Context, config *mongoConfig) (*mongo.Client, *mongo.Database, error) {
 	// Create a context with timeout for the connection
 	connectionCtx, cancel := context.WithTimeout(ctx, config.timeout)
 	defer cancel()
@@ -52,7 +55,8 @@ func connect(ctx context.Context, config mongoConfig) (*mongo.Client, *mongo.Dat
 		SetMinPoolSize(5).
 		SetMaxConnIdleTime(30 * time.Minute).
 		SetRetryWrites(true).
-		SetRetryReads(true)
+		SetRetryReads(true).
+		SetReplicaSet(config.replicaSet)
 
 	//Connect to MongoDB
 	client, err := mongo.Connect(connectionCtx, clientOpts)

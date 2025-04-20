@@ -3,55 +3,45 @@ package domain
 import (
 	"fmt"
 	"slices"
+
+	"github.com/iammrsea/social-app/internal/shared/rbac"
 )
-
-type UserRole string
-
-const (
-	Admin     UserRole = "ADMIN"
-	Moderator UserRole = "MODERATOR"
-	Regular   UserRole = "REGULAR"
-)
-
-func (r UserRole) String() string {
-	return string(r)
-}
 
 func (u *User) IsModerator() bool {
-	return u.role == Moderator
+	return u.role == rbac.Moderator
 }
 
 func (u *User) IsAdmin() bool {
-	return u.role == Admin
+	return u.role == rbac.Admin
 }
 
 func (u *User) MakeModerator() error {
-	if u.role == Moderator {
+	if u.role == rbac.Moderator {
 		return fmt.Errorf("the user %s is already a moderator", u.username)
 	}
-	u.role = Moderator
+	u.role = rbac.Moderator
 	return nil
 }
 
 func (u *User) IsRegular() bool {
-	return u.role == Regular
+	return u.role == rbac.Regular
 }
 
-func (u *User) Role() UserRole {
+func (u *User) Role() rbac.UserRole {
 	return u.role
 }
 
 func (u *User) MakeRegular() error {
-	if u.role == Regular {
+	if u.role == rbac.Regular {
 		return fmt.Errorf("the user %s is already a regular", u.username)
 	}
-	u.role = Regular
+	u.role = rbac.Regular
 
 	return nil
 }
 
-func isValidRole(role UserRole) bool {
-	validRoles := []UserRole{Moderator, Admin, Regular}
+func isValidRole(role rbac.UserRole) bool {
+	validRoles := []rbac.UserRole{rbac.Moderator, rbac.Admin, rbac.Regular}
 
 	return slices.Contains(validRoles, role)
 }

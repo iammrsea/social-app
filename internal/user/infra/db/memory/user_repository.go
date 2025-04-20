@@ -7,6 +7,7 @@ import (
 	"slices"
 	"time"
 
+	"github.com/iammrsea/social-app/internal/shared/rbac"
 	"github.com/iammrsea/social-app/internal/user/domain"
 )
 
@@ -43,7 +44,7 @@ func (m *memoryRepository) GetUserById(ctx context.Context, userId string) (*dom
 	return &domain.UserReadModel{
 		Username: u.username,
 		Email:    u.email,
-		Role:     domain.UserRole(u.role),
+		Role:     rbac.UserRole(u.role),
 		Id:       u.id,
 		Reputation: domain.UserReputation{
 			ReputationScore: u.reputation.reputationScore,
@@ -63,7 +64,7 @@ func (m *memoryRepository) GetUserByEmail(ctx context.Context, email string) (*d
 	return &domain.UserReadModel{
 		Username: u.username,
 		Email:    u.email,
-		Role:     domain.UserRole(u.role),
+		Role:     rbac.UserRole(u.role),
 		Id:       u.id,
 		Reputation: domain.UserReputation{
 			ReputationScore: u.reputation.reputationScore,
@@ -79,7 +80,7 @@ func (m *memoryRepository) GetUsers(ctx context.Context, opts domain.GetUsersOpt
 		users = append(users, &domain.UserReadModel{
 			Username: user.username,
 			Email:    user.email,
-			Role:     domain.UserRole(user.role),
+			Role:     rbac.UserRole(user.role),
 			Id:       user.id,
 			Reputation: domain.UserReputation{
 				ReputationScore: user.reputation.reputationScore,
@@ -184,7 +185,7 @@ func (m *memoryRepository) toDomainUser(userModel *userModel) *domain.User {
 		userModel.id,
 		userModel.email,
 		userModel.username,
-		domain.UserRole(userModel.role),
+		rbac.UserRole(userModel.role),
 		userModel.createdAt,
 		userModel.updatedAt,
 		domain.MustNewUserReputation(userModel.reputation.reputationScore, userModel.reputation.badges),

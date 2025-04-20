@@ -2,13 +2,13 @@ package command
 
 import (
 	"context"
-	"crypto/rand"
-	"errors"
 	"time"
 
 	"github.com/iammrsea/social-app/internal/shared"
 	"github.com/iammrsea/social-app/internal/shared/auth"
+	"github.com/iammrsea/social-app/internal/shared/rbac"
 	"github.com/iammrsea/social-app/internal/user/domain"
+	"github.com/lucsky/cuid"
 )
 
 type RegisterUserCommand struct {
@@ -20,37 +20,26 @@ type RegisterUserHandler = shared.CommandHandler[RegisterUserCommand]
 
 type registerUserCommandHandler struct {
 	userRepo domain.UserRepository
+	guard    rbac.RequestGuard
 }
 
-func NewRegisterUserCommandHandler(userRepo domain.UserRepository) RegisterUserHandler {
-	if userRepo == nil {
-		panic("nil user Repository")
+func NewRegisterUserCommandHandler(userRepo domain.UserRepository, guard rbac.RequestGuard) RegisterUserHandler {
+	if userRepo == nil || guard == nil {
+		panic("nil user repository or guard")
 	}
-	return &registerUserCommandHandler{userRepo: userRepo}
+	return &registerUserCommandHandler{userRepo: userRepo, guard: guard}
 }
 
 func (r *registerUserCommandHandler) Handle(ctx context.Context, cmd RegisterUserCommand) error {
 	authUser := auth.GetUserFromCtx(ctx)
-	if authUser.IsZero() {
-		return errors.New("you are already signed in")
+	if err := r.guard.Authorize(authUser.Role, rbac.CreateAccount); err != nil {
+		return err
 	}
-
-	id := rand.Text()
-	user, err := domain.NewUser(id,
-		cmd.Email, cmd.Username,
-		domain.Regular,
-		time.Now(),
-		time.Now(),
-		nil)
+	user, err := domain.NewUser(
+		cuid.New(), cmd.Email, cmd.Username,
+		rbac.Regular, time.Now(), time.Now(), nil)
 	if err != nil {
 		return err
 	}
-
-	err = r.userRepo.Register(ctx, user)
-
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return r.userRepo.Register(ctx, user)
 }

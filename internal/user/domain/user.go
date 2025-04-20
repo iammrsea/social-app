@@ -6,6 +6,8 @@ import (
 	"slices"
 	"strings"
 	"time"
+
+	"github.com/iammrsea/social-app/internal/shared/rbac"
 )
 
 type User struct {
@@ -13,7 +15,7 @@ type User struct {
 	email      string
 	username   string
 	reputation *userReputation
-	role       UserRole
+	role       rbac.UserRole
 	banStatus  *banning
 	joinedAt   time.Time
 	updatedAt  time.Time
@@ -24,7 +26,6 @@ type userReputation struct {
 	badges          []string
 }
 
-// Keep error messages here so we can import and reuse them for unit testing
 var (
 	ErrUserIdRequired        = errors.New("user id cannot be empty")
 	ErrUserEmailRequired     = errors.New("user email cannot be empty")
@@ -38,7 +39,7 @@ var (
 	ErrUserNotFound          = errors.New("user not found")
 )
 
-func NewUser(id, email, username string, role UserRole, joinedAt time.Time, updatedAt time.Time, reputation *userReputation) (User, error) {
+func NewUser(id, email, username string, role rbac.UserRole, joinedAt time.Time, updatedAt time.Time, reputation *userReputation) (User, error) {
 	user := User{}
 	if strings.TrimSpace(id) == "" {
 		return user, ErrUserIdRequired
@@ -53,7 +54,7 @@ func NewUser(id, email, username string, role UserRole, joinedAt time.Time, upda
 		return user, ErrUserRoleRequired
 	}
 	if !isValidRole(role) {
-		return user, fmt.Errorf("invalid user role. Valid user roles are %s, %s and %s", Admin, Moderator, Regular)
+		return user, fmt.Errorf("invalid user role. Valid user roles are %s, %s and %s", rbac.Admin, rbac.Moderator, rbac.Regular)
 	}
 
 	if reputation == nil {
@@ -66,34 +67,12 @@ func NewUser(id, email, username string, role UserRole, joinedAt time.Time, upda
 	return User{id: id, email: email, joinedAt: joinedAt, updatedAt: updatedAt, username: username, role: role, reputation: reputation, banStatus: &banning{isBanned: false}}, nil
 }
 
-func MustNewUser(id, email, username string, role UserRole, joinedAt time.Time, updatedAt time.Time, reputation *userReputation) User {
+func MustNewUser(id, email, username string, role rbac.UserRole, joinedAt time.Time, updatedAt time.Time, reputation *userReputation) User {
 	user, err := NewUser(id, email, username, role, joinedAt, updatedAt, reputation)
 	if err != nil {
 		panic(err.Error())
 	}
 	return user
-}
-
-func newRegularUser(id, email, username string, reputation *userReputation) (User, error) {
-	user := User{}
-	if strings.TrimSpace(id) == "" {
-		return user, ErrUserIdRequired
-	}
-	if strings.TrimSpace(email) == "" {
-		return user, ErrUserEmailRequired
-	}
-	if strings.TrimSpace(username) == "" {
-		return user, ErrUsernameRequired
-	}
-
-	if reputation == nil {
-		reputation = &userReputation{
-			reputationScore: 0,
-			badges:          []string{},
-		}
-	}
-
-	return User{id: id, email: email, joinedAt: time.Now(), updatedAt: time.Now(), username: username, role: Regular, reputation: reputation, banStatus: &banning{isBanned: false}}, nil
 }
 
 func NewUserReputation(score int, badges []string) (*userReputation, error) {

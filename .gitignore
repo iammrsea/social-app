@@ -2,3 +2,4 @@ demo.go
 .env
 .env.production
 tmp
+__debug

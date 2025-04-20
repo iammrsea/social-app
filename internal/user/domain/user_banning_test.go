@@ -4,6 +4,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/iammrsea/social-app/internal/shared/rbac"
 	"github.com/iammrsea/social-app/internal/user/domain"
 	"github.com/stretchr/testify/assert"
 )
@@ -111,7 +112,7 @@ func mustBan(user *domain.User) {
 
 func createUser() domain.User {
 	return domain.MustNewUser("user-id", "example@gmail.com",
-		"john-doe", domain.Regular,
+		"john-doe", rbac.Regular,
 		time.Now(),
 		time.Now(),
 		nil)

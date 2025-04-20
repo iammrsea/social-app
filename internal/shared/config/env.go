@@ -22,19 +22,21 @@ const (
 type ENV_VARIABLE string
 
 const (
-	AUTH_SECRET  ENV_VARIABLE = "AUTH_SECRET"
-	GO_ENV       ENV_VARIABLE = "GO_ENV"
-	PORT         ENV_VARIABLE = "PORT"
-	MONGODB_URI  ENV_VARIABLE = "MONGODB_URI"
-	MONGODB_NAME ENV_VARIABLE = "MONGODB_NAME"
+	AUTH_SECRET         ENV_VARIABLE = "AUTH_SECRET"
+	GO_ENV              ENV_VARIABLE = "GO_ENV"
+	PORT                ENV_VARIABLE = "PORT"
+	MONGODB_URI         ENV_VARIABLE = "MONGODB_URI"
+	MONGODB_NAME        ENV_VARIABLE = "MONGODB_NAME"
+	MONGODB_REPLICA_SET ENV_VARIABLE = "MONGODB_REPLICA_SET"
 )
 
 type env struct {
-	authSecret  string
-	goEnv       Environment
-	port        string
-	mongoDbURI  string
-	mongoDbName string
+	authSecret        string
+	goEnv             Environment
+	port              string
+	mongoDbURI        string
+	mongoDbName       string
+	mongoDbReplicaSet string
 }
 
 func (e *env) AuthSecret() string {
@@ -54,6 +56,9 @@ func (e *env) MongoDbName() string {
 
 func (e *env) Port() string {
 	return e.port
+}
+func (e *env) MongoDbReplicaSet() string {
+	return e.mongoDbReplicaSet
 }
 
 func init() {
@@ -90,13 +95,18 @@ func Env() *env {
 	if strings.TrimSpace(port) == "" {
 		port = DEFAULT_PORT
 	}
+	mongoReplicaSet := getEnv(MONGODB_REPLICA_SET)
+	if strings.TrimSpace(mongoReplicaSet) == "" {
+		panic(fmt.Sprintf("%s environment variable is not set", MONGODB_REPLICA_SET))
+	}
 
 	return &env{
-		authSecret:  authSecret,
-		goEnv:       Environment(goEnv),
-		port:        port,
-		mongoDbURI:  mongoURI,
-		mongoDbName: mongoName,
+		authSecret:        authSecret,
+		goEnv:             Environment(goEnv),
+		port:              port,
+		mongoDbURI:        mongoURI,
+		mongoDbName:       mongoName,
+		mongoDbReplicaSet: mongoReplicaSet,
 	}
 }
 

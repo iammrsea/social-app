@@ -5,6 +5,7 @@ import (
 	"errors"
 	"time"
 
+	"github.com/iammrsea/social-app/internal/shared/rbac"
 	"github.com/iammrsea/social-app/internal/user/domain"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -31,11 +32,21 @@ type userDocument struct {
 	Reputaion userReputation `bson:"reputation"`
 	CreatedAt time.Time      `bson:"createdAt"`
 	UpdatedAt time.Time      `bson:"updatedAt"`
+	BanStatus userBanStatus  `bson:"banStatus"`
 }
 
 type userReputation struct {
 	ReputationScore int      `bson:"reputationScore"`
 	Badges          []string `bson:"badges"`
+}
+
+type userBanStatus struct {
+	IsBanned        bool      `bson:"isBanned"`
+	BannedAt        time.Time `bson:"bannedAt"`
+	BanStartDate    time.Time `bson:"banStartDate"`
+	BanEndDate      time.Time `bson:"banEndDate"`
+	ReasonForBan    string    `bson:"reasonForBan"`
+	IsBanIndefinite bool      `bson:"isBanIndefinite"`
 }
 
 // Register adds a new user to the database
@@ -55,22 +66,27 @@ func (r *UserRepository) Register(ctx context.Context, user domain.User) error {
 }
 
 // MakeModerator updates a user to have moderator role
-func (r *UserRepository) MakeModerator(ctx context.Context, userId string, updateFn func(user *domain.User) (*domain.User, error)) error {
+func (r *UserRepository) MakeModerator(ctx context.Context, userId string, updateFn func(user *domain.User) error) error {
 	return r.getAndUpdateUser(ctx, userId, updateFn)
 }
 
 // AwardBadge adds a badge to a user
-func (r *UserRepository) AwardBadge(ctx context.Context, userId string, updateFn func(user *domain.User) (*domain.User, error)) error {
+func (r *UserRepository) AwardBadge(ctx context.Context, userId string, updateFn func(user *domain.User) error) error {
 	return r.getAndUpdateUser(ctx, userId, updateFn)
 }
 
 // RevokeAwardedBadge removes a badge from a user
-func (r *UserRepository) RevokeAwardedBadge(ctx context.Context, userId string, updateFn func(user *domain.User) (*domain.User, error)) error {
+func (r *UserRepository) RevokeAwardedBadge(ctx context.Context, userId string, updateFn func(user *domain.User) error) error {
 	return r.getAndUpdateUser(ctx, userId, updateFn)
 }
 
 // ChangeUsername updates a user's username
-func (r *UserRepository) ChangeUsername(ctx context.Context, userId string, updateFn func(user *domain.User) (*domain.User, error)) error {
+func (r *UserRepository) ChangeUsername(ctx context.Context, userId string, updateFn func(user *domain.User) error) error {
+	return r.getAndUpdateUser(ctx, userId, updateFn)
+}
+
+// BanUser bans a user
+func (r *UserRepository) BanUser(ctx context.Context, userId string, updateFn func(user *domain.User) error) error {
 	return r.getAndUpdateUser(ctx, userId, updateFn)
 }
 
@@ -159,18 +175,26 @@ func documentToReadModel(doc userDocument) *domain.UserReadModel {
 		Username:  doc.Username,
 		Email:     doc.Email,
 		Id:        doc.ID,
-		Role:      domain.UserRole(doc.Role),
+		Role:      rbac.UserRole(doc.Role),
 		CreatedAt: doc.CreatedAt,
 		UpdatedAt: doc.UpdatedAt,
 		Reputation: domain.UserReputation{
 			ReputationScore: doc.Reputaion.ReputationScore,
 			Badges:          doc.Reputaion.Badges,
 		},
+		BanStatus: domain.BanStatus{
+			IsBanned:        doc.BanStatus.IsBanned,
+			BannedAt:        doc.BanStatus.BannedAt,
+			BanStartDate:    doc.BanStatus.BanStartDate,
+			BanEndDate:      doc.BanStatus.BanEndDate,
+			ReasonForBan:    doc.BanStatus.ReasonForBan,
+			IsBanIndefinite: doc.BanStatus.IsBanIndefinite,
+		},
 	}
 }
 
 // getAndUpdateUser is a helper function for updating user documents
-func (r *UserRepository) getAndUpdateUser(ctx context.Context, userId string, updateFn func(user *domain.User) (*domain.User, error)) error {
+func (r *UserRepository) getAndUpdateUser(ctx context.Context, userId string, updateFn func(user *domain.User) error) error {
 	// Start a session and transaction
 	session, err := r.collection.Database().Client().StartSession()
 	if err != nil {
@@ -178,7 +202,7 @@ func (r *UserRepository) getAndUpdateUser(ctx context.Context, userId string, up
 	}
 	defer session.EndSession(ctx)
 
-	callback := func(sessionCtx mongo.SessionContext) (interface{}, error) {
+	callback := func(sessionCtx mongo.SessionContext) (any, error) {
 		// Get the current user
 		var doc userDocument
 		err := r.collection.FindOne(sessionCtx, bson.M{"_id": userId}).Decode(&doc)
@@ -191,12 +215,12 @@ func (r *UserRepository) getAndUpdateUser(ctx context.Context, userId string, up
 		// Convert to domain model
 		user := doc.toDomain()
 		//Apply the update function
-		updatedUser, err := updateFn(&user)
+		err = updateFn(&user)
 		if err != nil {
 			return nil, err
 		}
 		//Convert back to document and update
-		updatedDoc := fromDomain(*updatedUser)
+		updatedDoc := fromDomain(user)
 		_, err = r.collection.ReplaceOne(sessionCtx, bson.M{"_id": userId}, updatedDoc)
 		return nil, err
 	}
@@ -218,6 +242,13 @@ func fromDomain(user domain.User) userDocument {
 		},
 		CreatedAt: user.JoinedAt(),
 		UpdatedAt: user.UpdatedAt(),
+		BanStatus: userBanStatus{
+			IsBanned:        user.IsBanned(),
+			BannedAt:        user.BannedAt(),
+			BanStartDate:    user.BanStartDate(),
+			BanEndDate:      user.BanEndDate(),
+			IsBanIndefinite: user.IsBanIndefinitely(),
+		},
 	}
 }
 
@@ -227,7 +258,7 @@ func (u userDocument) toDomain() domain.User {
 		u.ID,
 		u.Email,
 		u.Username,
-		domain.UserRole(u.Role),
+		rbac.UserRole(u.Role),
 		u.CreatedAt,
 		u.UpdatedAt,
 		domain.MustNewUserReputation(u.Reputaion.ReputationScore, u.Reputaion.Badges),

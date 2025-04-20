@@ -2,10 +2,10 @@ package command
 
 import (
 	"context"
-	"errors"
 
 	"github.com/iammrsea/social-app/internal/shared"
 	"github.com/iammrsea/social-app/internal/shared/auth"
+	"github.com/iammrsea/social-app/internal/shared/rbac"
 	"github.com/iammrsea/social-app/internal/user/domain"
 )
 
@@ -18,34 +18,22 @@ type AwardBadgeHandler = shared.CommandHandler[AwardBadgeCommand]
 
 type awardBagdeCommandHandler struct {
 	userRepo domain.UserRepository
+	guard    rbac.RequestGuard
 }
 
-func NewAwardBadgeCommandHandler(userRepo domain.UserRepository) AwardBadgeHandler {
-	if userRepo == nil {
-		panic("nil user Repository")
+func NewAwardBadgeCommandHandler(userRepo domain.UserRepository, guard rbac.RequestGuard) AwardBadgeHandler {
+	if userRepo == nil || guard == nil {
+		panic("nil user repository or guard")
 	}
-	return &awardBagdeCommandHandler{userRepo: userRepo}
+	return &awardBagdeCommandHandler{userRepo: userRepo, guard: guard}
 }
 
 func (a *awardBagdeCommandHandler) Handle(ctx context.Context, cmd AwardBadgeCommand) error {
 	authUser := auth.GetUserFromCtx(ctx)
-	if !authUser.IsAuthenticated() {
-		return errors.New("unauthorized")
-	}
-	if authUser.Role != domain.Admin {
-		return errors.New("only an admin can award a badge to a user")
-	}
-	err := a.userRepo.AwardBadge(ctx, cmd.Id, func(user *domain.User) (*domain.User, error) {
-		err := user.AwardBadge(cmd.Badge)
-		if err != nil {
-			return nil, err
-		}
-		return user, nil
-	})
-
-	if err != nil {
+	if err := a.guard.Authorize(authUser.Role, rbac.AwardBadge); err != nil {
 		return err
 	}
-
-	return nil
+	return a.userRepo.AwardBadge(ctx, cmd.Id, func(user *domain.User) error {
+		return user.AwardBadge(cmd.Badge)
+	})
 }

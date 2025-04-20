@@ -7,7 +7,7 @@ import (
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/iammrsea/social-app/internal/shared/config"
-	"github.com/iammrsea/social-app/internal/user/domain"
+	"github.com/iammrsea/social-app/internal/shared/rbac"
 )
 
 type contextKey int
@@ -17,7 +17,7 @@ const userCtxKey contextKey = iota
 type AuthenticatedUser struct {
 	Email string
 	Id    string
-	Role  domain.UserRole
+	Role  rbac.UserRole
 }
 
 func (a *AuthenticatedUser) IsZero() bool {
@@ -31,7 +31,7 @@ func (a *AuthenticatedUser) IsAuthenticated() bool {
 func AuthMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if config.Env().GoEnv() == config.Test {
-			user := GetFakeUser()
+			user := GetFakeUser(rbac.Admin)
 			ctx := context.WithValue(r.Context(), userCtxKey, user)
 			next.ServeHTTP(w, r.WithContext(ctx))
 			return
@@ -52,19 +52,21 @@ func AuthMiddleware(next http.Handler) http.Handler {
 }
 
 type AuthClaims struct {
-	UserId string          `json:"sub"`
-	Email  string          `json:"email"`
-	Role   domain.UserRole `json:"role"`
+	UserId string        `json:"sub"`
+	Email  string        `json:"email"`
+	Role   rbac.UserRole `json:"role"`
 	jwt.RegisteredClaims
 }
 
 func (c *AuthClaims) IsZero() bool {
-	return c.Email == "" || c.UserId == "" || c.Role == ""
+	return c.Email == "" || c.UserId == "" || c.Role == rbac.Guest
 }
 
 func ParseTokenFromRequest(r *http.Request) *AuthClaims {
 	authHeader := r.Header.Get("Authorization")
-	zeroClaims := &AuthClaims{}
+	zeroClaims := &AuthClaims{
+		Role: rbac.Guest,
+	}
 
 	if strings.TrimSpace(authHeader) == "" {
 		return zeroClaims
@@ -79,7 +81,7 @@ func ParseTokenFromRequest(r *http.Request) *AuthClaims {
 
 	secret := []byte(config.Env().AuthSecret())
 
-	token, err := jwt.ParseWithClaims(bearerToken, &AuthClaims{}, func(t *jwt.Token) (interface{}, error) {
+	token, err := jwt.ParseWithClaims(bearerToken, &AuthClaims{}, func(t *jwt.Token) (any, error) {
 		return secret, nil
 	})
 

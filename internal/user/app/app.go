@@ -16,6 +16,7 @@ type CommandHandler struct {
 	command.AwardBadgeHandler
 	command.MakeModeratorHandler
 	command.ChangeUsernameHandler
+	command.BanUserHandler
 }
 
 type QueryHandler struct {

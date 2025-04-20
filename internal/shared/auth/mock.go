@@ -1,18 +1,23 @@
 package auth
 
 import (
+	"strings"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/iammrsea/social-app/internal/shared/config"
-	"github.com/iammrsea/social-app/internal/user/domain"
+	"github.com/iammrsea/social-app/internal/shared/rbac"
 )
 
-func GetFakeUser() *AuthenticatedUser {
+func GetFakeUser(role rbac.UserRole) *AuthenticatedUser {
+	r := role
+	if strings.TrimSpace(string(r)) == "" {
+		r = rbac.Moderator
+	}
 	return &AuthenticatedUser{
 		Email: "johndoe@example.com",
 		Id:    "user-123",
-		Role:  domain.Moderator,
+		Role:  r,
 	}
 }
 

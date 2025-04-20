@@ -45,5 +45,8 @@ tidy:
 clean:
 	rm -rf $(BIN_DIR)
 
-dev-watch:
+dev:
 	air
+
+generate:
+	go generate github.com/iammrsea/social-app/cmd/server/graphql

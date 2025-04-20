@@ -167,9 +167,12 @@ models:
       - github.com/iammrsea/social-app/internal/user/domain.UserReputation
   UserRole:
     model:
-      - github.com/iammrsea/social-app/internal/user/domain.UserRole
+      - github.com/iammrsea/social-app/internal/shared/rbac.UserRole
   PageInfo:
     model: github.com/iammrsea/social-app/internal/shared/pagination.PageInfo
+  UserBanStatus:
+    model:
+      - github.com/iammrsea/social-app/internal/user/domain.BanStatus
 
   # Todo:
   #   fields:

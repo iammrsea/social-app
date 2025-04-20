@@ -14,6 +14,7 @@ import (
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/iammrsea/social-app/cmd/server/graphql/graph/model"
 	"github.com/iammrsea/social-app/internal/shared/pagination"
+	"github.com/iammrsea/social-app/internal/shared/rbac"
 	"github.com/iammrsea/social-app/internal/user/domain"
 	"github.com/vektah/gqlparser/v2/ast"
 )
@@ -194,9 +195,9 @@ func (ec *executionContext) _User_role(ctx context.Context, field graphql.Collec
 		}
 		return graphql.Null
 	}
-	res := resTmp.(domain.UserRole)
+	res := resTmp.(rbac.UserRole)
 	fc.Result = res
-	return ec.marshalNUserRole2githubᚗcomᚋiammrseaᚋsocialᚑappᚋinternalᚋuserᚋdomainᚐUserRole(ctx, field.Selections, res)
+	return ec.marshalNUserRole2githubᚗcomᚋiammrseaᚋsocialᚑappᚋinternalᚋsharedᚋrbacᚐUserRole(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_User_role(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -342,6 +343,313 @@ func (ec *executionContext) fieldContext_User_updatedAt(_ context.Context, field
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type Time does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _User_banStatus(ctx context.Context, field graphql.CollectedField, obj *domain.UserReadModel) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_User_banStatus(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.BanStatus, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(domain.BanStatus)
+	fc.Result = res
+	return ec.marshalNUserBanStatus2githubᚗcomᚋiammrseaᚋsocialᚑappᚋinternalᚋuserᚋdomainᚐBanStatus(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_User_banStatus(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "User",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "bannedAt":
+				return ec.fieldContext_UserBanStatus_bannedAt(ctx, field)
+			case "banStartDate":
+				return ec.fieldContext_UserBanStatus_banStartDate(ctx, field)
+			case "banEndDate":
+				return ec.fieldContext_UserBanStatus_banEndDate(ctx, field)
+			case "isBanIndefinite":
+				return ec.fieldContext_UserBanStatus_isBanIndefinite(ctx, field)
+			case "reasonForBan":
+				return ec.fieldContext_UserBanStatus_reasonForBan(ctx, field)
+			case "isBanned":
+				return ec.fieldContext_UserBanStatus_isBanned(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type UserBanStatus", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UserBanStatus_bannedAt(ctx context.Context, field graphql.CollectedField, obj *domain.BanStatus) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UserBanStatus_bannedAt(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.BannedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(time.Time)
+	fc.Result = res
+	return ec.marshalOTime2timeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UserBanStatus_bannedAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UserBanStatus",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Time does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UserBanStatus_banStartDate(ctx context.Context, field graphql.CollectedField, obj *domain.BanStatus) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UserBanStatus_banStartDate(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.BanStartDate, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(time.Time)
+	fc.Result = res
+	return ec.marshalOTime2timeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UserBanStatus_banStartDate(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UserBanStatus",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Time does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UserBanStatus_banEndDate(ctx context.Context, field graphql.CollectedField, obj *domain.BanStatus) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UserBanStatus_banEndDate(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.BanEndDate, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(time.Time)
+	fc.Result = res
+	return ec.marshalOTime2timeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UserBanStatus_banEndDate(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UserBanStatus",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Time does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UserBanStatus_isBanIndefinite(ctx context.Context, field graphql.CollectedField, obj *domain.BanStatus) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UserBanStatus_isBanIndefinite(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.IsBanIndefinite, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalOBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UserBanStatus_isBanIndefinite(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UserBanStatus",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UserBanStatus_reasonForBan(ctx context.Context, field graphql.CollectedField, obj *domain.BanStatus) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UserBanStatus_reasonForBan(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ReasonForBan, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalOString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UserBanStatus_reasonForBan(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UserBanStatus",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UserBanStatus_isBanned(ctx context.Context, field graphql.CollectedField, obj *domain.BanStatus) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UserBanStatus_isBanned(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.IsBanned, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UserBanStatus_isBanned(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UserBanStatus",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
 		},
 	}
 	return fc, nil
@@ -504,6 +812,8 @@ func (ec *executionContext) fieldContext_UserEdge_node(_ context.Context, field 
 				return ec.fieldContext_User_createdAt(ctx, field)
 			case "updatedAt":
 				return ec.fieldContext_User_updatedAt(ctx, field)
+			case "banStatus":
+				return ec.fieldContext_User_banStatus(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
@@ -647,6 +957,40 @@ func (ec *executionContext) fieldContext_UserReputation_badges(_ context.Context
 
 // region    **************************** input.gotpl *****************************
 
+func (ec *executionContext) unmarshalInputAwardBadge(ctx context.Context, obj any) (model.AwardBadge, error) {
+	var it model.AwardBadge
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"id", "badge"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "id":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ID = data
+		case "badge":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("badge"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Badge = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputChangeUsername(ctx context.Context, obj any) (model.ChangeUsername, error) {
 	var it model.ChangeUsername
 	asMap := map[string]any{}
@@ -763,6 +1107,60 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 			}
 		case "updatedAt":
 			out.Values[i] = ec._User_updatedAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "banStatus":
+			out.Values[i] = ec._User_banStatus(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var userBanStatusImplementors = []string{"UserBanStatus"}
+
+func (ec *executionContext) _UserBanStatus(ctx context.Context, sel ast.SelectionSet, obj *domain.BanStatus) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, userBanStatusImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("UserBanStatus")
+		case "bannedAt":
+			out.Values[i] = ec._UserBanStatus_bannedAt(ctx, field, obj)
+		case "banStartDate":
+			out.Values[i] = ec._UserBanStatus_banStartDate(ctx, field, obj)
+		case "banEndDate":
+			out.Values[i] = ec._UserBanStatus_banEndDate(ctx, field, obj)
+		case "isBanIndefinite":
+			out.Values[i] = ec._UserBanStatus_isBanIndefinite(ctx, field, obj)
+		case "reasonForBan":
+			out.Values[i] = ec._UserBanStatus_reasonForBan(ctx, field, obj)
+		case "isBanned":
+			out.Values[i] = ec._UserBanStatus_isBanned(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -956,6 +1354,11 @@ func (ec *executionContext) _UserReputation(ctx context.Context, sel ast.Selecti
 
 // region    ***************************** type.gotpl *****************************
 
+func (ec *executionContext) unmarshalNAwardBadge2githubᚗcomᚋiammrseaᚋsocialᚑappᚋcmdᚋserverᚋgraphqlᚋgraphᚋmodelᚐAwardBadge(ctx context.Context, v any) (model.AwardBadge, error) {
+	res, err := ec.unmarshalInputAwardBadge(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalNChangeUsername2githubᚗcomᚋiammrseaᚋsocialᚑappᚋcmdᚋserverᚋgraphqlᚋgraphᚋmodelᚐChangeUsername(ctx context.Context, v any) (model.ChangeUsername, error) {
 	res, err := ec.unmarshalInputChangeUsername(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -989,6 +1392,10 @@ func (ec *executionContext) marshalNUser2ᚖgithubᚗcomᚋiammrseaᚋsocialᚑa
 		return graphql.Null
 	}
 	return ec._User(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNUserBanStatus2githubᚗcomᚋiammrseaᚋsocialᚑappᚋinternalᚋuserᚋdomainᚐBanStatus(ctx context.Context, sel ast.SelectionSet, v domain.BanStatus) graphql.Marshaler {
+	return ec._UserBanStatus(ctx, sel, &v)
 }
 
 func (ec *executionContext) marshalNUserConnection2githubᚗcomᚋiammrseaᚋsocialᚑappᚋcmdᚋserverᚋgraphqlᚋgraphᚋmodelᚐUserConnection(ctx context.Context, sel ast.SelectionSet, v model.UserConnection) graphql.Marshaler {
@@ -1059,19 +1466,29 @@ func (ec *executionContext) marshalNUserEdge2ᚖgithubᚗcomᚋiammrseaᚋsocial
 	return ec._UserEdge(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNUserRole2githubᚗcomᚋiammrseaᚋsocialᚑappᚋinternalᚋuserᚋdomainᚐUserRole(ctx context.Context, v any) (domain.UserRole, error) {
+func (ec *executionContext) unmarshalNUserRole2githubᚗcomᚋiammrseaᚋsocialᚑappᚋinternalᚋsharedᚋrbacᚐUserRole(ctx context.Context, v any) (rbac.UserRole, error) {
 	tmp, err := graphql.UnmarshalString(v)
-	res := domain.UserRole(tmp)
+	res := rbac.UserRole(tmp)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNUserRole2githubᚗcomᚋiammrseaᚋsocialᚑappᚋinternalᚋuserᚋdomainᚐUserRole(ctx context.Context, sel ast.SelectionSet, v domain.UserRole) graphql.Marshaler {
+func (ec *executionContext) marshalNUserRole2githubᚗcomᚋiammrseaᚋsocialᚑappᚋinternalᚋsharedᚋrbacᚐUserRole(ctx context.Context, sel ast.SelectionSet, v rbac.UserRole) graphql.Marshaler {
 	res := graphql.MarshalString(string(v))
 	if res == graphql.Null {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
 		}
 	}
+	return res
+}
+
+func (ec *executionContext) unmarshalOTime2timeᚐTime(ctx context.Context, v any) (time.Time, error) {
+	res, err := graphql.UnmarshalTime(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOTime2timeᚐTime(ctx context.Context, sel ast.SelectionSet, v time.Time) graphql.Marshaler {
+	res := graphql.MarshalTime(v)
 	return res
 }
 

@@ -2,16 +2,12 @@ package query
 
 import (
 	"context"
-	"errors"
 
 	"github.com/iammrsea/social-app/internal/shared"
 	"github.com/iammrsea/social-app/internal/shared/auth"
+	"github.com/iammrsea/social-app/internal/shared/rbac"
 	"github.com/iammrsea/social-app/internal/user/domain"
 )
-
-type UserByIdRepository interface {
-	GetUserById(ctx context.Context, id string) (*domain.UserReadModel, error)
-}
 
 type GetUserByIdHandler = shared.QueryHandler[GetUserByIdCommand, *domain.UserReadModel]
 
@@ -21,22 +17,22 @@ type GetUserByIdCommand struct {
 
 type getUserByIdCommandHandler struct {
 	queryRepo domain.UserReadModelRepository
+	guard     rbac.RequestGuard
 }
 
-func NewGetUserByIdCommandHandler(queryRepo domain.UserReadModelRepository) GetUserByIdHandler {
-	if queryRepo == nil {
-		panic("nil user repository")
+func NewGetUserByIdCommandHandler(queryRepo domain.UserReadModelRepository, guard rbac.RequestGuard) GetUserByIdHandler {
+	if queryRepo == nil || guard == nil {
+		panic("nil user repository or guard")
 	}
-	return &getUserByIdCommandHandler{queryRepo: queryRepo}
+	return &getUserByIdCommandHandler{queryRepo: queryRepo, guard: guard}
 }
 
 func (g *getUserByIdCommandHandler) Handle(ctx context.Context, cmd GetUserByIdCommand) (*domain.UserReadModel, error) {
 	authUser := auth.GetUserFromCtx(ctx)
-	if !authUser.IsAuthenticated() {
-		return nil, errors.New("unauthorized")
+	if err := g.guard.Authorize(authUser.Role, rbac.ViewUser); err != nil {
+		return nil, err
 	}
 	user, err := g.queryRepo.GetUserById(ctx, cmd.Id)
-
 	if err != nil {
 		return nil, err
 	}

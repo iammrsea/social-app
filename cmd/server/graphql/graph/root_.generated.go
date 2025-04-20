@@ -44,10 +44,13 @@ type DirectiveRoot struct {
 
 type ComplexityRoot struct {
 	Mutation struct {
-		ChangeUsername func(childComplexity int, input model.ChangeUsername) int
-		MakeModerator  func(childComplexity int, id string) int
-		RegisterUser   func(childComplexity int, input model.RegisterUser) int
-		Vote           func(childComplexity int, input *model.VoteInput) int
+		AwardBadge         func(childComplexity int, input model.AwardBadge) int
+		BanUser            func(childComplexity int, id string) int
+		ChangeUsername     func(childComplexity int, input model.ChangeUsername) int
+		MakeModerator      func(childComplexity int, id string) int
+		RegisterUser       func(childComplexity int, input model.RegisterUser) int
+		RevokeAwardedBadge func(childComplexity int, input model.AwardBadge) int
+		Vote               func(childComplexity int, input *model.VoteInput) int
 	}
 
 	PageInfo struct {
@@ -58,12 +61,14 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		GetUserByID func(childComplexity int, id string) int
-		GetUsers    func(childComplexity int, first *int32, after *string) int
-		GetVotes    func(childComplexity int) int
+		GetUserByEmail func(childComplexity int, email string) int
+		GetUserByID    func(childComplexity int, id string) int
+		GetUsers       func(childComplexity int, first *int32, after *string) int
+		GetVotes       func(childComplexity int) int
 	}
 
 	User struct {
+		BanStatus  func(childComplexity int) int
 		CreatedAt  func(childComplexity int) int
 		Email      func(childComplexity int) int
 		Id         func(childComplexity int) int
@@ -71,6 +76,15 @@ type ComplexityRoot struct {
 		Role       func(childComplexity int) int
 		UpdatedAt  func(childComplexity int) int
 		Username   func(childComplexity int) int
+	}
+
+	UserBanStatus struct {
+		BanEndDate      func(childComplexity int) int
+		BanStartDate    func(childComplexity int) int
+		BannedAt        func(childComplexity int) int
+		IsBanIndefinite func(childComplexity int) int
+		IsBanned        func(childComplexity int) int
+		ReasonForBan    func(childComplexity int) int
 	}
 
 	UserConnection struct {
@@ -114,6 +128,30 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 	_ = ec
 	switch typeName + "." + field {
 
+	case "Mutation.awardBadge":
+		if e.complexity.Mutation.AwardBadge == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_awardBadge_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.AwardBadge(childComplexity, args["input"].(model.AwardBadge)), true
+
+	case "Mutation.banUser":
+		if e.complexity.Mutation.BanUser == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_banUser_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.BanUser(childComplexity, args["id"].(string)), true
+
 	case "Mutation.changeUsername":
 		if e.complexity.Mutation.ChangeUsername == nil {
 			break
@@ -149,6 +187,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.RegisterUser(childComplexity, args["input"].(model.RegisterUser)), true
+
+	case "Mutation.revokeAwardedBadge":
+		if e.complexity.Mutation.RevokeAwardedBadge == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_revokeAwardedBadge_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.RevokeAwardedBadge(childComplexity, args["input"].(model.AwardBadge)), true
 
 	case "Mutation.vote":
 		if e.complexity.Mutation.Vote == nil {
@@ -190,6 +240,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.PageInfo.StartCursor(childComplexity), true
 
+	case "Query.getUserByEmail":
+		if e.complexity.Query.GetUserByEmail == nil {
+			break
+		}
+
+		args, err := ec.field_Query_getUserByEmail_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.GetUserByEmail(childComplexity, args["email"].(string)), true
+
 	case "Query.getUserById":
 		if e.complexity.Query.GetUserByID == nil {
 			break
@@ -220,6 +282,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.GetVotes(childComplexity), true
+
+	case "User.banStatus":
+		if e.complexity.User.BanStatus == nil {
+			break
+		}
+
+		return e.complexity.User.BanStatus(childComplexity), true
 
 	case "User.createdAt":
 		if e.complexity.User.CreatedAt == nil {
@@ -269,6 +338,48 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.User.Username(childComplexity), true
+
+	case "UserBanStatus.banEndDate":
+		if e.complexity.UserBanStatus.BanEndDate == nil {
+			break
+		}
+
+		return e.complexity.UserBanStatus.BanEndDate(childComplexity), true
+
+	case "UserBanStatus.banStartDate":
+		if e.complexity.UserBanStatus.BanStartDate == nil {
+			break
+		}
+
+		return e.complexity.UserBanStatus.BanStartDate(childComplexity), true
+
+	case "UserBanStatus.bannedAt":
+		if e.complexity.UserBanStatus.BannedAt == nil {
+			break
+		}
+
+		return e.complexity.UserBanStatus.BannedAt(childComplexity), true
+
+	case "UserBanStatus.isBanIndefinite":
+		if e.complexity.UserBanStatus.IsBanIndefinite == nil {
+			break
+		}
+
+		return e.complexity.UserBanStatus.IsBanIndefinite(childComplexity), true
+
+	case "UserBanStatus.isBanned":
+		if e.complexity.UserBanStatus.IsBanned == nil {
+			break
+		}
+
+		return e.complexity.UserBanStatus.IsBanned(childComplexity), true
+
+	case "UserBanStatus.reasonForBan":
+		if e.complexity.UserBanStatus.ReasonForBan == nil {
+			break
+		}
+
+		return e.complexity.UserBanStatus.ReasonForBan(childComplexity), true
 
 	case "UserConnection.edges":
 		if e.complexity.UserConnection.Edges == nil {
@@ -341,6 +452,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	opCtx := graphql.GetOperationContext(ctx)
 	ec := executionContext{opCtx, e, 0, 0, make(chan graphql.DeferredResult)}
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
+		ec.unmarshalInputAwardBadge,
 		ec.unmarshalInputChangeUsername,
 		ec.unmarshalInputRegisterUser,
 		ec.unmarshalInputVoteInput,
@@ -478,6 +590,7 @@ type User {
     reputation: UserReputation
     createdAt: Time!
     updatedAt: Time!
+    banStatus: UserBanStatus!
 }
 
 type UserEdge {
@@ -493,6 +606,15 @@ type UserConnection {
 type UserReputation {
     reputationScore: Int!
     badges: [String!]!
+}
+
+type UserBanStatus {
+    bannedAt: Time
+    banStartDate: Time
+    banEndDate: Time
+    isBanIndefinite: Boolean
+    reasonForBan: String
+    isBanned: Boolean!
 }
 
 enum UserRole {
@@ -514,12 +636,21 @@ input RegisterUser {
 extend type Query {
     getUserById(id: String!): User
     getUsers(first: Int = 10, after: String): UserConnection!
+    getUserByEmail(email: String!): User
+}
+
+input AwardBadge {
+    id: String!
+    badge: String!
 }
 
 extend type Mutation {
     changeUsername(input: ChangeUsername!): User
     makeModerator(id: String!): User
+    banUser(id: String!): User
     registerUser(input: RegisterUser!): User
+    awardBadge(input: AwardBadge!): User
+    revokeAwardedBadge(input: AwardBadge!): User
 }
 `, BuiltIn: false},
 }

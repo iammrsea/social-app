@@ -2,10 +2,10 @@ package query
 
 import (
 	"context"
-	"errors"
 
 	"github.com/iammrsea/social-app/internal/shared"
 	"github.com/iammrsea/social-app/internal/shared/auth"
+	"github.com/iammrsea/social-app/internal/shared/rbac"
 	"github.com/iammrsea/social-app/internal/user/domain"
 )
 
@@ -21,22 +21,22 @@ type GetUserByEmailCommand struct {
 
 type getUserByEmailCommandHandler struct {
 	queryRepo domain.UserReadModelRepository
+	guard     rbac.RequestGuard
 }
 
-func NewGetUserByEmailCommandHandler(queryRepo domain.UserReadModelRepository) GetUserByEmailHandler {
-	if queryRepo == nil {
-		panic("nil user repository")
+func NewGetUserByEmailCommandHandler(queryRepo domain.UserReadModelRepository, guard rbac.RequestGuard) GetUserByEmailHandler {
+	if queryRepo == nil || guard == nil {
+		panic("nil user repository or guard")
 	}
-	return &getUserByEmailCommandHandler{queryRepo: queryRepo}
+	return &getUserByEmailCommandHandler{queryRepo: queryRepo, guard: guard}
 }
 
 func (g *getUserByEmailCommandHandler) Handle(ctx context.Context, cmd GetUserByEmailCommand) (*domain.UserReadModel, error) {
 	authUser := auth.GetUserFromCtx(ctx)
-	if !authUser.IsAuthenticated() {
-		return nil, errors.New("unauthorized")
+	if err := g.guard.Authorize(authUser.Role, rbac.ViewUser); err != nil {
+		return nil, err
 	}
 	user, err := g.queryRepo.GetUserByEmail(ctx, cmd.Email)
-
 	if err != nil {
 		return nil, err
 	}

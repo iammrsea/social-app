@@ -12,6 +12,7 @@ type banning struct {
 	isInDefinitely bool
 	from           time.Time
 	to             time.Time
+	bannedAt       time.Time
 }
 
 type BanTimeline struct {
@@ -44,6 +45,7 @@ func (u *User) Ban(reason string, isInDefinitely bool, timeline *BanTimeline) er
 	u.banStatus.isBanned = true
 	u.banStatus.reason = reason
 	u.banStatus.isInDefinitely = isInDefinitely
+	u.banStatus.bannedAt = time.Now()
 	if timeline != nil {
 		u.banStatus.from = timeline.from
 		u.banStatus.to = timeline.to
@@ -81,4 +83,8 @@ func (u *User) BanStartDate() time.Time {
 
 func (u *User) BanEndDate() time.Time {
 	return u.banStatus.to
+}
+
+func (u *User) BannedAt() time.Time {
+	return u.banStatus.bannedAt
 }

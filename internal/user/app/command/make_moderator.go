@@ -2,10 +2,10 @@ package command
 
 import (
 	"context"
-	"errors"
 
 	"github.com/iammrsea/social-app/internal/shared"
 	"github.com/iammrsea/social-app/internal/shared/auth"
+	"github.com/iammrsea/social-app/internal/shared/rbac"
 	"github.com/iammrsea/social-app/internal/user/domain"
 )
 
@@ -17,34 +17,24 @@ type MakeModeratorHandler = shared.CommandHandler[MakeModeratorCommand]
 
 type makeModeratorCommandHandler struct {
 	userRepo domain.UserRepository
+	guard    rbac.RequestGuard
 }
 
-func NewMakeModeratorCommandHandler(userRepo domain.UserRepository) MakeModeratorHandler {
-	if userRepo == nil {
-		panic("nil user Repository")
+func NewMakeModeratorCommandHandler(userRepo domain.UserRepository, guard rbac.RequestGuard) MakeModeratorHandler {
+	if userRepo == nil || guard == nil {
+		panic("nil user repository or guard")
 	}
-	return &makeModeratorCommandHandler{userRepo: userRepo}
+	return &makeModeratorCommandHandler{userRepo: userRepo, guard: guard}
 }
 
 func (r *makeModeratorCommandHandler) Handle(ctx context.Context, cmd MakeModeratorCommand) error {
 	authUser := auth.GetUserFromCtx(ctx)
-	if !authUser.IsAuthenticated() {
-		return errors.New("unauthorized")
-	}
-	if authUser.Role != domain.Admin {
-		return errors.New("only an admin can change user role")
-	}
-	err := r.userRepo.MakeModerator(ctx, cmd.Id, func(user *domain.User) (*domain.User, error) {
-		err := user.MakeModerator()
-		if err != nil {
-			return user, err
-		}
-		return nil, nil
-	})
-
-	if err != nil {
+	if err := r.guard.Authorize(authUser.Role, rbac.MakeModerator); err != nil {
 		return err
 	}
+	err := r.userRepo.MakeModerator(ctx, cmd.Id, func(user *domain.User) error {
+		return user.MakeModerator()
+	})
 
-	return nil
+	return err
 }

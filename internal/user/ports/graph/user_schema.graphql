@@ -8,6 +8,7 @@ type User {
     reputation: UserReputation
     createdAt: Time!
     updatedAt: Time!
+    banStatus: UserBanStatus!
 }
 
 type UserEdge {
@@ -23,6 +24,15 @@ type UserConnection {
 type UserReputation {
     reputationScore: Int!
     badges: [String!]!
+}
+
+type UserBanStatus {
+    bannedAt: Time
+    banStartDate: Time
+    banEndDate: Time
+    isBanIndefinite: Boolean
+    reasonForBan: String
+    isBanned: Boolean!
 }
 
 enum UserRole {
@@ -44,10 +54,19 @@ input RegisterUser {
 extend type Query {
     getUserById(id: String!): User
     getUsers(first: Int = 10, after: String): UserConnection!
+    getUserByEmail(email: String!): User
+}
+
+input AwardBadge {
+    id: String!
+    badge: String!
 }
 
 extend type Mutation {
     changeUsername(input: ChangeUsername!): User
     makeModerator(id: String!): User
+    banUser(id: String!): User
     registerUser(input: RegisterUser!): User
+    awardBadge(input: AwardBadge!): User
+    revokeAwardedBadge(input: AwardBadge!): User
 }

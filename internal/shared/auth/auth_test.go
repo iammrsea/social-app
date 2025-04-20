@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/iammrsea/social-app/internal/shared/auth"
+	"github.com/iammrsea/social-app/internal/shared/rbac"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -29,7 +30,7 @@ func TestParseTokenFromRequest(t *testing.T) {
 		t.Parallel()
 
 		req := httptest.NewRequest(http.MethodGet, "/some-url", nil)
-		fakeUser := auth.GetFakeUser()
+		fakeUser := auth.GetFakeUser(rbac.Moderator)
 		token := auth.GenerateTestToken(fakeUser)
 		req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token))
 

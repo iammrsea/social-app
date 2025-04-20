@@ -6,6 +6,7 @@ package graph
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/iammrsea/social-app/cmd/server/graphql/graph/model"
@@ -42,6 +43,18 @@ func (r *mutationResolver) MakeModerator(ctx context.Context, id string) (*domai
 	})
 }
 
+// BanUser is the resolver for the banUser field.
+func (r *mutationResolver) BanUser(ctx context.Context, id string) (*domain.UserReadModel, error) {
+	if err := r.Services.UserService.CommandHandler.BanUserHandler.Handle(ctx, command.BanUserCommand{
+		Id: id,
+	}); err != nil {
+		return nil, err
+	}
+	return r.Services.UserService.QueryHandler.GetUserByIdHandler.Handle(ctx, query.GetUserByIdCommand{
+		Id: id,
+	})
+}
+
 // RegisterUser is the resolver for the registerUser field.
 func (r *mutationResolver) RegisterUser(ctx context.Context, input model.RegisterUser) (*domain.UserReadModel, error) {
 	err := r.Services.UserService.CommandHandler.RegisterUserHandler.Handle(ctx, command.RegisterUserCommand{
@@ -54,6 +67,16 @@ func (r *mutationResolver) RegisterUser(ctx context.Context, input model.Registe
 	return r.Services.UserService.QueryHandler.GetUserByEmailHandler.Handle(ctx, query.GetUserByEmailCommand{
 		Email: input.Email,
 	})
+}
+
+// AwardBadge is the resolver for the awardBadge field.
+func (r *mutationResolver) AwardBadge(ctx context.Context, input model.AwardBadge) (*domain.UserReadModel, error) {
+	panic(fmt.Errorf("not implemented: AwardBadge - awardBadge"))
+}
+
+// RevokeAwardedBadge is the resolver for the revokeAwardedBadge field.
+func (r *mutationResolver) RevokeAwardedBadge(ctx context.Context, input model.AwardBadge) (*domain.UserReadModel, error) {
+	panic(fmt.Errorf("not implemented: RevokeAwardedBadge - revokeAwardedBadge"))
 }
 
 // GetUserByID is the resolver for the getUserById field.
@@ -95,12 +118,12 @@ func (r *queryResolver) GetUsers(ctx context.Context, first *int32, after *strin
 
 	for i, user := range result.Data {
 		cursor := user.CreatedAt.UTC().Format(time.RFC3339Nano)
+		fmt.Println("user: ", user.BanStatus)
 		edges[i] = &model.UserEdge{
 			Cursor: pagination.EncodeCursor(cursor),
 			Node:   user,
 		}
 	}
-
 	startCursor := edges[0].Cursor
 	endCursor := edges[len(edges)-1].Cursor
 
@@ -113,6 +136,11 @@ func (r *queryResolver) GetUsers(ctx context.Context, first *int32, after *strin
 			EndCursor:       endCursor,
 		},
 	}, nil
+}
+
+// GetUserByEmail is the resolver for the getUserByEmail field.
+func (r *queryResolver) GetUserByEmail(ctx context.Context, email string) (*domain.UserReadModel, error) {
+	panic(fmt.Errorf("not implemented: GetUserByEmail - getUserByEmail"))
 }
 
 // ReputationScore is the resolver for the reputationScore field.
@@ -132,8 +160,15 @@ type userReputationResolver struct{ *Resolver }
 //    it when you're done.
 //  - You have helper methods in this file. Move them out to keep these resolver files clean.
 /*
-	func (r *userResolver) Role(ctx context.Context, obj *domain.UserReadModel) (domain.UserRole, error) {
-	return obj.Role, nil
+	func (r *userResolver) BanStatus(ctx context.Context, obj *domain.UserReadModel) (*model.UserBanStatus, error) {
+	fmt.Println("Ban status: ", obj.BanStatus)
+	return &model.UserBanStatus{
+		BannedAt:        obj.BanStatus.BannedAt,
+		ReasonForBan:    &obj.BanStatus.ReasonForBan,
+		BanStartDate:    obj.BanStatus.BanStartDate,
+		BanEndDate:      obj.BanStatus.BanEndDate,
+		IsBanIndefinite: obj.BanStatus.IsBanIndefinite,
+	}, nil
 }
 func (r *Resolver) User() UserResolver { return &userResolver{r} }
 type userResolver struct{ *Resolver }

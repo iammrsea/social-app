@@ -13,6 +13,7 @@ import (
 	"github.com/iammrsea/social-app/internal/shared/auth"
 	"github.com/iammrsea/social-app/internal/shared/config"
 	"github.com/iammrsea/social-app/internal/shared/config/db"
+	"github.com/iammrsea/social-app/internal/shared/rbac"
 	"github.com/iammrsea/social-app/internal/user/infra/db/mongodb"
 	"github.com/iammrsea/social-app/internal/user/service"
 )
@@ -36,16 +37,21 @@ func main() {
 
 	ctx := context.Background()
 
-	// Use any database of choice
+	// Use any database of your choice
 	mongoDB, closeConnection := db.SetupMongoDB(ctx)
 
 	defer closeConnection()
 
-	// Create repositories
+	// Repositories
 	userRepo := mongodb.NewUserRepository(mongoDB)
 	userReadModelRepo := mongodb.NewUserReadModelRepository(mongoDB)
+
+	// Guard
+	policy := rbac.NewPolicy()
+	guard := rbac.NewRequestGuard(policy)
+
 	services := &internal.Services{
-		UserService: service.NewUserService(userRepo, userReadModelRepo),
+		UserService: service.NewUserService(userRepo, userReadModelRepo, guard),
 	}
 
 	graphql.SetupHttGraphQLServer(router, services)

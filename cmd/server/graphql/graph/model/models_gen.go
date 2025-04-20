@@ -7,6 +7,11 @@ import (
 	"github.com/iammrsea/social-app/internal/user/domain"
 )
 
+type AwardBadge struct {
+	ID    string `json:"id"`
+	Badge string `json:"badge"`
+}
+
 type ChangeUsername struct {
 	ID       string `json:"id"`
 	Username string `json:"username"`

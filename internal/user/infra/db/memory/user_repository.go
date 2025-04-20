@@ -103,24 +103,24 @@ func (m *memoryRepository) Register(ctx context.Context, user domain.User) error
 	return nil
 }
 
-func (m *memoryRepository) MakeModerator(ctx context.Context, userId string, updateFn func(user *domain.User) (*domain.User, error)) error {
+func (m *memoryRepository) MakeModerator(ctx context.Context, userId string, updateFn func(user *domain.User) error) error {
 	u, err := m.getUserModelById(userId)
 
 	if err != nil {
 		return err
 	}
 	userDomain := m.toDomainUser(u)
-	updatedUser, err := updateFn(userDomain)
+	err = updateFn(userDomain)
 
 	if err != nil {
 		return err
 	}
 
-	u.role = string(updatedUser.Role())
+	u.role = string(userDomain.Role())
 
 	return nil
 }
-func (m *memoryRepository) AwardBadge(ctx context.Context, userId string, updateFn func(user *domain.User) (*domain.User, error)) error {
+func (m *memoryRepository) AwardBadge(ctx context.Context, userId string, updateFn func(user *domain.User) error) error {
 	u, err := m.getUserModelById(userId)
 
 	if err != nil {
@@ -128,41 +128,41 @@ func (m *memoryRepository) AwardBadge(ctx context.Context, userId string, update
 	}
 	userDomain := m.toDomainUser(u)
 
-	updatedUser, err := updateFn(userDomain)
+	err = updateFn(userDomain)
 
 	if err != nil {
 		return err
 	}
-	u.reputation.badges = updatedUser.Badges()
+	u.reputation.badges = userDomain.Badges()
 	return nil
 }
-func (m *memoryRepository) RevokeAwardedBadge(ctx context.Context, userId string, updateFn func(user *domain.User) (*domain.User, error)) error {
+func (m *memoryRepository) RevokeAwardedBadge(ctx context.Context, userId string, updateFn func(user *domain.User) error) error {
 	u, err := m.getUserModelById(userId)
 	if err != nil {
 		return err
 	}
 	userDomain := m.toDomainUser(u)
-	updatedUser, err := updateFn(userDomain)
+	err = updateFn(userDomain)
 	if err != nil {
 		return err
 	}
-	u.reputation.badges = updatedUser.Badges()
+	u.reputation.badges = userDomain.Badges()
 
 	return nil
 }
-func (m *memoryRepository) ChangeUsername(ctx context.Context, userId string, updateFn func(user *domain.User) (*domain.User, error)) error {
+func (m *memoryRepository) ChangeUsername(ctx context.Context, userId string, updateFn func(user *domain.User) error) error {
 	u, err := m.getUserModelById(userId)
 	if err != nil {
 		return err
 	}
 	userDomain := m.toDomainUser(u)
 
-	updatedUser, err := updateFn(userDomain)
+	err = updateFn(userDomain)
 
 	if err != nil {
 		return err
 	}
-	u.username = updatedUser.Username()
+	u.username = userDomain.Username()
 	return nil
 }
 

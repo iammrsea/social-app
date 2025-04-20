@@ -13,7 +13,7 @@ type policy interface {
 }
 
 type requestGuard struct {
-	policy policy
+	policy
 }
 
 func NewRequestGuard(p policy) RequestGuard {

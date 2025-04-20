@@ -9,25 +9,25 @@ import (
 	"github.com/iammrsea/social-app/internal/user/domain"
 )
 
-type ChangeUsernameCommand struct {
+type ChangeUsername struct {
 	Id       string
 	Username string
 }
 
-type ChangeUsernameHandler = shared.CommandHandler[ChangeUsernameCommand]
+type ChangeUsernameHandler = shared.CommandHandler[ChangeUsername]
 
-type changeUsernameCommandHandler struct {
+type changeUsernameHandler struct {
 	userRepo domain.UserRepository
 }
 
-func NewChangeUsernameCommandHandler(userRep domain.UserRepository) ChangeUsernameHandler {
+func NewChangeUsernameHandler(userRep domain.UserRepository) ChangeUsernameHandler {
 	if userRep == nil {
 		panic("nil user repository")
 	}
-	return &changeUsernameCommandHandler{userRepo: userRep}
+	return &changeUsernameHandler{userRepo: userRep}
 }
 
-func (c *changeUsernameCommandHandler) Handle(ctx context.Context, cmd ChangeUsernameCommand) error {
+func (c *changeUsernameHandler) Handle(ctx context.Context, cmd ChangeUsername) error {
 	authUser := auth.GetUserFromCtx(ctx)
 	if err := abac.CanChangeUsername(cmd.Id, authUser); err != nil {
 		return err

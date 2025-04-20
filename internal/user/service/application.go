@@ -12,17 +12,17 @@ import (
 func NewUserService(userRepo domain.UserRepository, userReadModelRepo domain.UserReadModelRepository, guard rbac.RequestGuard) *app.Application {
 	return &app.Application{
 		CommandHandler: app.CommandHandler{
-			RegisterUserHandler:       command.NewRegisterUserCommandHandler(userRepo, guard),
-			RevokeAwardedBagdeHandler: command.NewRevokeAwardedBadgeCommandHandler(userRepo, guard),
-			AwardBadgeHandler:         command.NewAwardBadgeCommandHandler(userRepo, guard),
-			MakeModeratorHandler:      command.NewMakeModeratorCommandHandler(userRepo, guard),
-			ChangeUsernameHandler:     command.NewChangeUsernameCommandHandler(userRepo),
-			BanUserHandler:            command.NewBanUserHandler(userRepo, guard),
+			RegisterUser:       command.NewRegisterUserHandler(userRepo, guard),
+			RevokeAwardedBadge: command.NewRevokeAwardedBadgeHandler(userRepo, guard),
+			AwardBadge:         command.NewAwardBadgeHandler(userRepo, guard),
+			MakeModerator:      command.NewMakeModeratorHandler(userRepo, guard),
+			ChangeUsername:     command.NewChangeUsernameHandler(userRepo),
+			BanUser:            command.NewBanUserHandler(userRepo, guard),
 		},
 		QueryHandler: app.QueryHandler{
-			GetUserByIdHandler:    query.NewGetUserByIdCommandHandler(userReadModelRepo, guard),
-			GetUsersHandler:       query.NewGetUsersCommandHandler(userReadModelRepo, guard),
-			GetUserByEmailHandler: query.NewGetUserByEmailCommandHandler(userReadModelRepo, guard),
+			GetUserById:    query.NewGetUserByIdHandler(userReadModelRepo, guard),
+			GetUsers:       query.NewGetUsersHandler(userReadModelRepo, guard),
+			GetUserByEmail: query.NewGetUserByEmailHandler(userReadModelRepo, guard),
 		},
 	}
 }

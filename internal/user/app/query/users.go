@@ -10,25 +10,25 @@ import (
 	"github.com/iammrsea/social-app/internal/user/domain"
 )
 
-type GetUsersCommand = domain.GetUsersOptions
+type GetUsers = domain.GetUsersOptions
 
 type Result = pagination.PaginatedQueryResult[[]*domain.UserReadModel]
 
-type GetUsersHandler = shared.QueryHandler[GetUsersCommand, *Result]
+type GetUsersHandler = shared.QueryHandler[GetUsers, *Result]
 
-type getUsersCommandHandler struct {
+type getUsersHandler struct {
 	queryRepo domain.UserReadModelRepository
 	guard     rbac.RequestGuard
 }
 
-func NewGetUsersCommandHandler(queryRepo domain.UserReadModelRepository, guard rbac.RequestGuard) GetUsersHandler {
+func NewGetUsersHandler(queryRepo domain.UserReadModelRepository, guard rbac.RequestGuard) GetUsersHandler {
 	if queryRepo == nil || guard == nil {
 		panic("nil user repository or guard")
 	}
-	return &getUsersCommandHandler{queryRepo: queryRepo, guard: guard}
+	return &getUsersHandler{queryRepo: queryRepo, guard: guard}
 }
 
-func (g *getUsersCommandHandler) Handle(ctx context.Context, cmd GetUsersCommand) (*Result, error) {
+func (g *getUsersHandler) Handle(ctx context.Context, cmd GetUsers) (*Result, error) {
 	authUser := auth.GetUserFromCtx(ctx)
 	if err := g.guard.Authorize(authUser.Role, rbac.ListUsers); err != nil {
 		return nil, err
@@ -37,11 +37,10 @@ func (g *getUsersCommandHandler) Handle(ctx context.Context, cmd GetUsersCommand
 	if err != nil {
 		return nil, err
 	}
-	result := &Result{
+	return &Result{
 		Data: users,
 		PaginationInfo: &pagination.PagenationInfo{
 			HasNext: hasNext,
 		},
-	}
-	return result, nil
+	}, nil
 }

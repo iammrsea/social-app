@@ -9,26 +9,26 @@ import (
 	"github.com/iammrsea/social-app/internal/user/domain"
 )
 
-type RevokeAwardedBadgeCommand struct {
+type RevokeAwardedBadge struct {
 	Id    string
 	Badge string
 }
 
-type RevokeAwardedBagdeHandler = shared.CommandHandler[RevokeAwardedBadgeCommand]
+type RevokeAwardedBadgeHandler = shared.CommandHandler[RevokeAwardedBadge]
 
-type revokeAwardedBagdeCommandHandler struct {
+type revokeAwardedBagdeHandler struct {
 	userRepo domain.UserRepository
 	guard    rbac.RequestGuard
 }
 
-func NewRevokeAwardedBadgeCommandHandler(userRepo domain.UserRepository, guard rbac.RequestGuard) RevokeAwardedBagdeHandler {
+func NewRevokeAwardedBadgeHandler(userRepo domain.UserRepository, guard rbac.RequestGuard) RevokeAwardedBadgeHandler {
 	if userRepo == nil || guard == nil {
 		panic("nil user repository or guard")
 	}
-	return &revokeAwardedBagdeCommandHandler{userRepo: userRepo, guard: guard}
+	return &revokeAwardedBagdeHandler{userRepo: userRepo, guard: guard}
 }
 
-func (r *revokeAwardedBagdeCommandHandler) Handle(ctx context.Context, cmd RevokeAwardedBadgeCommand) error {
+func (r *revokeAwardedBagdeHandler) Handle(ctx context.Context, cmd RevokeAwardedBadge) error {
 	authUser := auth.GetUserFromCtx(ctx)
 	if err := r.guard.Authorize(authUser.Role, rbac.RevokeBadge); err != nil {
 		return err

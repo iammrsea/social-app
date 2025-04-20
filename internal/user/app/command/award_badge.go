@@ -9,26 +9,26 @@ import (
 	"github.com/iammrsea/social-app/internal/user/domain"
 )
 
-type AwardBadgeCommand struct {
+type AwardBadge struct {
 	Id    string
 	Badge string
 }
 
-type AwardBadgeHandler = shared.CommandHandler[AwardBadgeCommand]
+type AwardBadgeHandler = shared.CommandHandler[AwardBadge]
 
-type awardBagdeCommandHandler struct {
+type awardBadgeHandler struct {
 	userRepo domain.UserRepository
 	guard    rbac.RequestGuard
 }
 
-func NewAwardBadgeCommandHandler(userRepo domain.UserRepository, guard rbac.RequestGuard) AwardBadgeHandler {
+func NewAwardBadgeHandler(userRepo domain.UserRepository, guard rbac.RequestGuard) AwardBadgeHandler {
 	if userRepo == nil || guard == nil {
 		panic("nil user repository or guard")
 	}
-	return &awardBagdeCommandHandler{userRepo: userRepo, guard: guard}
+	return &awardBadgeHandler{userRepo: userRepo, guard: guard}
 }
 
-func (a *awardBagdeCommandHandler) Handle(ctx context.Context, cmd AwardBadgeCommand) error {
+func (a *awardBadgeHandler) Handle(ctx context.Context, cmd AwardBadge) error {
 	authUser := auth.GetUserFromCtx(ctx)
 	if err := a.guard.Authorize(authUser.Role, rbac.AwardBadge); err != nil {
 		return err

@@ -9,32 +9,28 @@ import (
 	"github.com/iammrsea/social-app/internal/user/domain"
 )
 
-type GetUserByIdHandler = shared.QueryHandler[GetUserByIdCommand, *domain.UserReadModel]
+type GetUserByIdHandler = shared.QueryHandler[GetUserById, *domain.UserReadModel]
 
-type GetUserByIdCommand struct {
+type GetUserById struct {
 	Id string
 }
 
-type getUserByIdCommandHandler struct {
+type getUserByIdHandler struct {
 	queryRepo domain.UserReadModelRepository
 	guard     rbac.RequestGuard
 }
 
-func NewGetUserByIdCommandHandler(queryRepo domain.UserReadModelRepository, guard rbac.RequestGuard) GetUserByIdHandler {
+func NewGetUserByIdHandler(queryRepo domain.UserReadModelRepository, guard rbac.RequestGuard) GetUserByIdHandler {
 	if queryRepo == nil || guard == nil {
 		panic("nil user repository or guard")
 	}
-	return &getUserByIdCommandHandler{queryRepo: queryRepo, guard: guard}
+	return &getUserByIdHandler{queryRepo: queryRepo, guard: guard}
 }
 
-func (g *getUserByIdCommandHandler) Handle(ctx context.Context, cmd GetUserByIdCommand) (*domain.UserReadModel, error) {
+func (g *getUserByIdHandler) Handle(ctx context.Context, cmd GetUserById) (*domain.UserReadModel, error) {
 	authUser := auth.GetUserFromCtx(ctx)
 	if err := g.guard.Authorize(authUser.Role, rbac.ViewUser); err != nil {
 		return nil, err
 	}
-	user, err := g.queryRepo.GetUserById(ctx, cmd.Id)
-	if err != nil {
-		return nil, err
-	}
-	return user, nil
+	return g.queryRepo.GetUserById(ctx, cmd.Id)
 }

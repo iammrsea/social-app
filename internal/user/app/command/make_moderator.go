@@ -9,32 +9,30 @@ import (
 	"github.com/iammrsea/social-app/internal/user/domain"
 )
 
-type MakeModeratorCommand struct {
+type MakeModerator struct {
 	Id string
 }
 
-type MakeModeratorHandler = shared.CommandHandler[MakeModeratorCommand]
+type MakeModeratorHandler = shared.CommandHandler[MakeModerator]
 
-type makeModeratorCommandHandler struct {
+type makeModeratorHandler struct {
 	userRepo domain.UserRepository
 	guard    rbac.RequestGuard
 }
 
-func NewMakeModeratorCommandHandler(userRepo domain.UserRepository, guard rbac.RequestGuard) MakeModeratorHandler {
+func NewMakeModeratorHandler(userRepo domain.UserRepository, guard rbac.RequestGuard) MakeModeratorHandler {
 	if userRepo == nil || guard == nil {
 		panic("nil user repository or guard")
 	}
-	return &makeModeratorCommandHandler{userRepo: userRepo, guard: guard}
+	return &makeModeratorHandler{userRepo: userRepo, guard: guard}
 }
 
-func (r *makeModeratorCommandHandler) Handle(ctx context.Context, cmd MakeModeratorCommand) error {
+func (r *makeModeratorHandler) Handle(ctx context.Context, cmd MakeModerator) error {
 	authUser := auth.GetUserFromCtx(ctx)
 	if err := r.guard.Authorize(authUser.Role, rbac.MakeModerator); err != nil {
 		return err
 	}
-	err := r.userRepo.MakeModerator(ctx, cmd.Id, func(user *domain.User) error {
+	return r.userRepo.MakeModerator(ctx, cmd.Id, func(user *domain.User) error {
 		return user.MakeModerator()
 	})
-
-	return err
 }

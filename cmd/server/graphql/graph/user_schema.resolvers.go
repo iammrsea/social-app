@@ -18,70 +18,88 @@ import (
 
 // ChangeUsername is the resolver for the changeUsername field.
 func (r *mutationResolver) ChangeUsername(ctx context.Context, input model.ChangeUsername) (*domain.UserReadModel, error) {
-	err := r.Services.UserService.CommandHandler.ChangeUsernameHandler.Handle(ctx, command.ChangeUsernameCommand{
+	err := r.Services.UserService.CommandHandler.ChangeUsername.Handle(ctx, command.ChangeUsername{
 		Id:       input.ID,
 		Username: input.Username,
 	})
 	if err != nil {
 		return nil, err
 	}
-	return r.Services.UserService.QueryHandler.GetUserByIdHandler.Handle(ctx, query.GetUserByIdCommand{
+	return r.Services.UserService.QueryHandler.GetUserById.Handle(ctx, query.GetUserById{
 		Id: input.ID,
 	})
 }
 
 // MakeModerator is the resolver for the makeModerator field.
 func (r *mutationResolver) MakeModerator(ctx context.Context, id string) (*domain.UserReadModel, error) {
-	err := r.Services.UserService.CommandHandler.MakeModeratorHandler.Handle(ctx, command.MakeModeratorCommand{
+	err := r.Services.UserService.CommandHandler.MakeModerator.Handle(ctx, command.MakeModerator{
 		Id: id,
 	})
 	if err != nil {
 		return nil, err
 	}
-	return r.Services.UserService.QueryHandler.GetUserByIdHandler.Handle(ctx, query.GetUserByIdCommand{
+	return r.Services.UserService.QueryHandler.GetUserById.Handle(ctx, query.GetUserById{
 		Id: id,
 	})
 }
 
 // BanUser is the resolver for the banUser field.
 func (r *mutationResolver) BanUser(ctx context.Context, id string) (*domain.UserReadModel, error) {
-	if err := r.Services.UserService.CommandHandler.BanUserHandler.Handle(ctx, command.BanUserCommand{
+	if err := r.Services.UserService.CommandHandler.BanUser.Handle(ctx, command.BanUser{
 		Id: id,
 	}); err != nil {
 		return nil, err
 	}
-	return r.Services.UserService.QueryHandler.GetUserByIdHandler.Handle(ctx, query.GetUserByIdCommand{
+	return r.Services.UserService.QueryHandler.GetUserById.Handle(ctx, query.GetUserById{
 		Id: id,
 	})
 }
 
 // RegisterUser is the resolver for the registerUser field.
 func (r *mutationResolver) RegisterUser(ctx context.Context, input model.RegisterUser) (*domain.UserReadModel, error) {
-	err := r.Services.UserService.CommandHandler.RegisterUserHandler.Handle(ctx, command.RegisterUserCommand{
+	err := r.Services.UserService.CommandHandler.RegisterUser.Handle(ctx, command.RegisterUser{
 		Email:    input.Email,
 		Username: input.Username,
 	})
 	if err != nil {
 		return nil, err
 	}
-	return r.Services.UserService.QueryHandler.GetUserByEmailHandler.Handle(ctx, query.GetUserByEmailCommand{
+	return r.Services.UserService.QueryHandler.GetUserByEmail.Handle(ctx, query.GetUserByEmail{
 		Email: input.Email,
 	})
 }
 
 // AwardBadge is the resolver for the awardBadge field.
 func (r *mutationResolver) AwardBadge(ctx context.Context, input model.AwardBadge) (*domain.UserReadModel, error) {
-	panic(fmt.Errorf("not implemented: AwardBadge - awardBadge"))
+	err := r.Services.UserService.CommandHandler.AwardBadge.Handle(ctx, command.AwardBadge{
+		Id:    input.ID,
+		Badge: input.Badge,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return r.Services.UserService.QueryHandler.GetUserById.Handle(ctx, query.GetUserById{
+		Id: input.ID,
+	})
 }
 
 // RevokeAwardedBadge is the resolver for the revokeAwardedBadge field.
 func (r *mutationResolver) RevokeAwardedBadge(ctx context.Context, input model.AwardBadge) (*domain.UserReadModel, error) {
-	panic(fmt.Errorf("not implemented: RevokeAwardedBadge - revokeAwardedBadge"))
+	err := r.Services.UserService.CommandHandler.RevokeAwardedBadge.Handle(ctx, command.RevokeAwardedBadge{
+		Id:    input.ID,
+		Badge: input.Badge,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return r.Services.UserService.QueryHandler.GetUserById.Handle(ctx, query.GetUserById{
+		Id: input.ID,
+	})
 }
 
 // GetUserByID is the resolver for the getUserById field.
 func (r *queryResolver) GetUserByID(ctx context.Context, id string) (*domain.UserReadModel, error) {
-	return r.Services.UserService.QueryHandler.GetUserByIdHandler.Handle(ctx, query.GetUserByIdCommand{
+	return r.Services.UserService.QueryHandler.GetUserById.Handle(ctx, query.GetUserById{
 		Id: id,
 	})
 }
@@ -101,7 +119,7 @@ func (r *queryResolver) GetUsers(ctx context.Context, first *int32, after *strin
 		}
 	}
 
-	result, err := r.Services.UserService.GetUsersHandler.Handle(ctx, query.GetUsersCommand{After: afterCursor, First: limit})
+	result, err := r.Services.UserService.GetUsers.Handle(ctx, query.GetUsers{After: afterCursor, First: limit})
 
 	if err != nil {
 		return nil, err
@@ -140,7 +158,10 @@ func (r *queryResolver) GetUsers(ctx context.Context, first *int32, after *strin
 
 // GetUserByEmail is the resolver for the getUserByEmail field.
 func (r *queryResolver) GetUserByEmail(ctx context.Context, email string) (*domain.UserReadModel, error) {
-	panic(fmt.Errorf("not implemented: GetUserByEmail - getUserByEmail"))
+	return r.Services.UserService.QueryHandler.GetUserByEmail.Handle(ctx, query.GetUserByEmail{
+		Email: email,
+	})
+
 }
 
 // ReputationScore is the resolver for the reputationScore field.

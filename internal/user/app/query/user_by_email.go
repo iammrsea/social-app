@@ -13,32 +13,28 @@ type UserByEmailRepository interface {
 	GetUserByEmail(ctx context.Context, email string) (*domain.UserReadModel, error)
 }
 
-type GetUserByEmailHandler = shared.QueryHandler[GetUserByEmailCommand, *domain.UserReadModel]
+type GetUserByEmailHandler = shared.QueryHandler[GetUserByEmail, *domain.UserReadModel]
 
-type GetUserByEmailCommand struct {
+type GetUserByEmail struct {
 	Email string
 }
 
-type getUserByEmailCommandHandler struct {
+type getUserByEmailHandler struct {
 	queryRepo domain.UserReadModelRepository
 	guard     rbac.RequestGuard
 }
 
-func NewGetUserByEmailCommandHandler(queryRepo domain.UserReadModelRepository, guard rbac.RequestGuard) GetUserByEmailHandler {
+func NewGetUserByEmailHandler(queryRepo domain.UserReadModelRepository, guard rbac.RequestGuard) GetUserByEmailHandler {
 	if queryRepo == nil || guard == nil {
 		panic("nil user repository or guard")
 	}
-	return &getUserByEmailCommandHandler{queryRepo: queryRepo, guard: guard}
+	return &getUserByEmailHandler{queryRepo: queryRepo, guard: guard}
 }
 
-func (g *getUserByEmailCommandHandler) Handle(ctx context.Context, cmd GetUserByEmailCommand) (*domain.UserReadModel, error) {
+func (g *getUserByEmailHandler) Handle(ctx context.Context, cmd GetUserByEmail) (*domain.UserReadModel, error) {
 	authUser := auth.GetUserFromCtx(ctx)
 	if err := g.guard.Authorize(authUser.Role, rbac.ViewUser); err != nil {
 		return nil, err
 	}
-	user, err := g.queryRepo.GetUserByEmail(ctx, cmd.Email)
-	if err != nil {
-		return nil, err
-	}
-	return user, nil
+	return g.queryRepo.GetUserByEmail(ctx, cmd.Email)
 }

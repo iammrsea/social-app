@@ -9,14 +9,14 @@ import (
 	"github.com/iammrsea/social-app/internal/user/domain"
 )
 
-type BanUserCommand struct {
+type BanUser struct {
 	Id             string
 	Reason         string
 	IsIndefinitely bool
 	Timeline       *domain.BanTimeline
 }
 
-type BanUserHandler = shared.CommandHandler[BanUserCommand]
+type BanUserHandler = shared.CommandHandler[BanUser]
 
 type banUserHandler struct {
 	userRepo domain.UserRepository
@@ -30,7 +30,7 @@ func NewBanUserHandler(userRepo domain.UserRepository, guard rbac.RequestGuard) 
 	return &banUserHandler{userRepo: userRepo, guard: guard}
 }
 
-func (a *banUserHandler) Handle(ctx context.Context, cmd BanUserCommand) error {
+func (a *banUserHandler) Handle(ctx context.Context, cmd BanUser) error {
 	authUser := auth.GetUserFromCtx(ctx)
 	if err := a.guard.Authorize(authUser.Role, rbac.BanUser); err != nil {
 		return err

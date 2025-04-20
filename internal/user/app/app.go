@@ -11,16 +11,16 @@ type Application struct {
 }
 
 type CommandHandler struct {
-	command.RegisterUserHandler
-	command.RevokeAwardedBagdeHandler
-	command.AwardBadgeHandler
-	command.MakeModeratorHandler
-	command.ChangeUsernameHandler
-	command.BanUserHandler
+	RegisterUser       command.RegisterUserHandler
+	RevokeAwardedBadge command.RevokeAwardedBadgeHandler
+	AwardBadge         command.AwardBadgeHandler
+	MakeModerator      command.MakeModeratorHandler
+	ChangeUsername     command.ChangeUsernameHandler
+	BanUser            command.BanUserHandler
 }
 
 type QueryHandler struct {
-	query.GetUserByIdHandler
-	query.GetUsersHandler
-	query.GetUserByEmailHandler
+	GetUserById    query.GetUserByIdHandler
+	GetUsers       query.GetUsersHandler
+	GetUserByEmail query.GetUserByEmailHandler
 }

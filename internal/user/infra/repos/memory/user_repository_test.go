@@ -8,7 +8,7 @@ import (
 
 	"github.com/iammrsea/social-app/internal/shared/rbac"
 	"github.com/iammrsea/social-app/internal/user/domain"
-	"github.com/iammrsea/social-app/internal/user/infra/db/memory"
+	"github.com/iammrsea/social-app/internal/user/infra/repos/memory"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -21,7 +21,7 @@ func TestRegister(t *testing.T) {
 			"johndoe", rbac.Regular,
 			time.Now(),
 			time.Now(),
-			nil)
+			nil, nil)
 
 		memRepo := memory.NewUserRepository(context.Background())
 
@@ -41,7 +41,7 @@ func TestRegister(t *testing.T) {
 
 		user := domain.MustNewUser("user-id", "johndoe@gmail.com", "johndoe", rbac.Regular,
 			time.Now(),
-			time.Now(), nil)
+			time.Now(), nil, nil)
 
 		memRepo := memory.NewUserRepository(context.Background())
 
@@ -65,7 +65,7 @@ func TestMakeModerator(t *testing.T) {
 
 		user := domain.MustNewUser("user-id", "johndoe@gmail.com", "johndoe", rbac.Regular,
 			time.Now(),
-			time.Now(), nil)
+			time.Now(), nil, nil)
 
 		memRepo := memory.NewUserRepository(context.Background())
 
@@ -107,7 +107,7 @@ func TestAwardBadge(t *testing.T) {
 
 		user := domain.MustNewUser("user-id", "johndoe@gmail.com", "johndoe", rbac.Regular,
 			time.Now(),
-			time.Now(), nil)
+			time.Now(), nil, nil)
 
 		memRepo := memory.NewUserRepository(context.Background())
 
@@ -149,7 +149,7 @@ func TestRevokeAwardedBadge(t *testing.T) {
 
 		user := domain.MustNewUser("user-id", "johndoe@gmail.com", "johndoe", rbac.Regular,
 			time.Now(),
-			time.Now(), nil)
+			time.Now(), nil, nil)
 
 		memRepo := memory.NewUserRepository(context.Background())
 
@@ -196,7 +196,7 @@ func TestChangeUsername(t *testing.T) {
 		t.Parallel()
 
 		user := domain.MustNewUser("user-id", "johndoe@gmail.com", "johndoe", rbac.Regular, time.Now(),
-			time.Now(), nil)
+			time.Now(), nil, nil)
 
 		memRepo := memory.NewUserRepository(context.Background())
 
@@ -238,7 +238,7 @@ func TestGetUserById(t *testing.T) {
 
 		user := domain.MustNewUser("user-id", "johndoe@gmail.com", "johndoe", rbac.Regular,
 			time.Now(),
-			time.Now(), nil)
+			time.Now(), nil, nil)
 
 		memRepo := memory.NewUserRepository(context.Background())
 
@@ -274,7 +274,7 @@ func TestGetUsers(t *testing.T) {
 	ctx := context.Background()
 	user := domain.MustNewUser("user-id", "johndoe@gmail.com", "johndoe", rbac.Regular,
 		time.Now(),
-		time.Now(), nil)
+		time.Now(), nil, nil)
 	err := memRepo.Register(ctx, user)
 	assert.Nil(t, err)
 
@@ -298,6 +298,7 @@ func TestGetUserByEmail(t *testing.T) {
 			"johndoe", rbac.Regular,
 			time.Now(),
 			time.Now(),
+			nil,
 			nil)
 		err := memRepo.Register(ctx, user)
 		assert.Nil(t, err)
@@ -336,7 +337,7 @@ func userDomainToUserReadModel(user domain.User) domain.UserReadModel {
 			BanStartDate:    user.BanStartDate(),
 			BanEndDate:      user.BanEndDate(),
 			ReasonForBan:    user.ReasonForBan(),
-			IsBanIndefinite: user.IsBanIndefinitely(),
+			IsBanIndefinite: user.IsBanIndefinite(),
 		},
 		CreatedAt: user.JoinedAt(),
 		UpdatedAt: user.UpdatedAt(),

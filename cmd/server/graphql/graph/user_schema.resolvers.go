@@ -6,7 +6,6 @@ package graph
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/iammrsea/social-app/cmd/server/graphql/graph/model"
@@ -136,7 +135,6 @@ func (r *queryResolver) GetUsers(ctx context.Context, first *int32, after *strin
 
 	for i, user := range result.Data {
 		cursor := user.CreatedAt.UTC().Format(time.RFC3339Nano)
-		fmt.Println("user: ", user.BanStatus)
 		edges[i] = &model.UserEdge{
 			Cursor: pagination.EncodeCursor(cursor),
 			Node:   user,

@@ -32,7 +32,7 @@ func GenerateTestToken(user *AuthenticatedUser) string {
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	secret := []byte(config.Env().AuthSecret())
+	secret := []byte(config.NewEnv().AuthSecret())
 	signedToken, err := token.SignedString(secret)
 
 	if err != nil {

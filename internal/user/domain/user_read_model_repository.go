@@ -3,8 +3,9 @@ package domain
 import "context"
 
 type GetUsersOptions struct {
-	First int32
-	After string
+	First         int32
+	After         string
+	SortDirection string // "ASC" or "DESC"
 }
 
 type UserReadModelRepository interface {

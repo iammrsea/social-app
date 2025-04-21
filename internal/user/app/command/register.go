@@ -2,10 +2,12 @@ package command
 
 import (
 	"context"
+	"errors"
 	"time"
 
 	"github.com/iammrsea/social-app/internal/shared"
 	"github.com/iammrsea/social-app/internal/shared/auth"
+	"github.com/iammrsea/social-app/internal/shared/custom_errors"
 	"github.com/iammrsea/social-app/internal/shared/rbac"
 	"github.com/iammrsea/social-app/internal/user/domain"
 	"github.com/lucsky/cuid"
@@ -35,9 +37,21 @@ func (r *registerUserHandler) Handle(ctx context.Context, cmd RegisterUser) erro
 	if err := r.guard.Authorize(authUser.Role, rbac.CreateAccount); err != nil {
 		return err
 	}
+
+	userExists, err := r.userRepo.GetUserBy(ctx, "email", cmd.Email)
+
+	if err != nil {
+		if !errors.Is(err, domain.ErrUserNotFound) {
+			return custom_errors.ErrInternalServerError
+		}
+	}
+	if userExists != nil {
+		return domain.ErrEmailAlreadyExists
+	}
+
 	user, err := domain.NewUser(
 		cuid.New(), cmd.Email, cmd.Username,
-		rbac.Regular, time.Now(), time.Now(), nil)
+		rbac.Regular, time.Now(), time.Now(), nil, nil)
 	if err != nil {
 		return err
 	}

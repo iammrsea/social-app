@@ -18,6 +18,7 @@ func NewUserService(userRepo domain.UserRepository, userReadModelRepo domain.Use
 			MakeModerator:      command.NewMakeModeratorHandler(userRepo, guard),
 			ChangeUsername:     command.NewChangeUsernameHandler(userRepo),
 			BanUser:            command.NewBanUserHandler(userRepo, guard),
+			UnbanUser:          command.NewUnbanUserHandler(userRepo, guard),
 		},
 		QueryHandler: app.QueryHandler{
 			GetUserById:    query.NewGetUserByIdHandler(userReadModelRepo, guard),

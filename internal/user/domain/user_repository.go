@@ -11,4 +11,5 @@ type UserRepository interface {
 	RevokeAwardedBadge(ctx context.Context, userId string, updateFn func(user *User) error) error
 	ChangeUsername(ctx context.Context, userId string, updateFn func(user *User) error) error
 	BanUser(ctx context.Context, userId string, updateFn func(user *User) error) error
+	GetUserBy(ctx context.Context, fieldName string, value any) (*User, error)
 }

@@ -52,6 +52,9 @@ func (m *memoryRepository) GetUserById(ctx context.Context, userId string) (*dom
 		},
 	}, nil
 }
+func (m *memoryRepository) BanUser(ctx context.Context, userId string, updateFn func(user *domain.User) error) error {
+	panic("not implemented")
+}
 
 func (m *memoryRepository) GetUserByEmail(ctx context.Context, email string) (*domain.UserReadModel, error) {
 	i := slices.IndexFunc(m.users, func(u *userModel) bool {
@@ -189,6 +192,7 @@ func (m *memoryRepository) toDomainUser(userModel *userModel) *domain.User {
 		userModel.createdAt,
 		userModel.updatedAt,
 		domain.MustNewUserReputation(userModel.reputation.reputationScore, userModel.reputation.badges),
+		nil,
 	)
 
 	return &user

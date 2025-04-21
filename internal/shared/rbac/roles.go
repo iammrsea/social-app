@@ -17,7 +17,7 @@ type Permission string
 
 const (
 	BanUser       Permission = "ban:user"
-	UnBanUser     Permission = "unban:user"
+	UnbanUser     Permission = "unban:user"
 	CreatePost    Permission = "create:post"
 	DeletePost    Permission = "delete:post"
 	UpdatePost    Permission = "update:post"

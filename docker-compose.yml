@@ -11,7 +11,6 @@ services:
       - social-app-network
     restart: unless-stopped
 
-  # Init container to set up the replica set
   mongo-init:
     image: mongo:7.0
     container_name: social-app-mongo-init
@@ -39,8 +38,39 @@ services:
       - social-app-network
     restart: unless-stopped
 
+  postgres:
+    image: postgres:15
+    container_name: social-app-postgres
+    environment:
+      POSTGRES_USER: socialapp
+      POSTGRES_PASSWORD: socialapp_password
+      POSTGRES_DB: socialapp_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./scripts/postgres-init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - social-app-network
+    restart: unless-stopped
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: social-app-pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@socialapp.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
+    depends_on:
+      - postgres
+    networks:
+      - social-app-network
+    restart: unless-stopped
+
 volumes:
   mongodb_data:
+  postgres_data:
 
 networks:
   social-app-network:

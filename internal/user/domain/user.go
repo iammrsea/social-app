@@ -16,7 +16,7 @@ type User struct {
 	username   string
 	reputation *userReputation
 	role       rbac.UserRole
-	banStatus  *banning
+	banStatus  *ban
 	joinedAt   time.Time
 	updatedAt  time.Time
 }
@@ -39,7 +39,9 @@ var (
 	ErrUserNotFound          = errors.New("user not found")
 )
 
-func NewUser(id, email, username string, role rbac.UserRole, joinedAt time.Time, updatedAt time.Time, reputation *userReputation) (User, error) {
+func NewUser(
+	id, email, username string, role rbac.UserRole, joinedAt time.Time, updatedAt time.Time,
+	reputation *userReputation, banStatus *ban) (User, error) {
 	user := User{}
 	if strings.TrimSpace(id) == "" {
 		return user, ErrUserIdRequired
@@ -64,11 +66,19 @@ func NewUser(id, email, username string, role rbac.UserRole, joinedAt time.Time,
 		}
 	}
 
-	return User{id: id, email: email, joinedAt: joinedAt, updatedAt: updatedAt, username: username, role: role, reputation: reputation, banStatus: &banning{isBanned: false}}, nil
+	if banStatus == nil {
+		banStatus = &ban{
+			isBanned: false,
+		}
+	}
+
+	return User{id: id, email: email, joinedAt: joinedAt, updatedAt: updatedAt, username: username, role: role, reputation: reputation, banStatus: banStatus}, nil
 }
 
-func MustNewUser(id, email, username string, role rbac.UserRole, joinedAt time.Time, updatedAt time.Time, reputation *userReputation) User {
-	user, err := NewUser(id, email, username, role, joinedAt, updatedAt, reputation)
+func MustNewUser(
+	id, email, username string, role rbac.UserRole, joinedAt time.Time, updatedAt time.Time,
+	reputation *userReputation, banStatus *ban) User {
+	user, err := NewUser(id, email, username, role, joinedAt, updatedAt, reputation, banStatus)
 	if err != nil {
 		panic(err.Error())
 	}

@@ -1,4 +1,4 @@
-package db
+package mongodb
 
 import (
 	"context"
@@ -11,30 +11,13 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/readpref"
 )
 
-// mongoConfig holds configuration for MongoDB connection
-type mongoConfig struct {
-	uri          string
-	databaseName string
-	timeout      time.Duration
-	replicaSet   string
-}
-
 // SetupMongoDB sets up and connects to MongoDB
-func SetupMongoDB(ctx context.Context) (*mongo.Database, func() error) {
-	uri := config.Env().MongoDbURI()
-	dbName := config.Env().MongoDbName()
-	replicaSet := config.Env().MongoDbReplicaSet()
-	mongoConfig := &mongoConfig{
-		uri:          uri,
-		databaseName: dbName,
-		timeout:      10 * time.Second,
-		replicaSet:   replicaSet,
-	}
-	client, db, err := connect(ctx, mongoConfig)
+func SetupMongoDB(ctx context.Context, cf *config.MongoConfig) (*mongo.Database, func() error) {
+	log.Default().Println("Connecting to MongoDB...")
+	client, db, err := connect(ctx, cf)
 	if err != nil {
 		log.Fatalf("Failed to connect to MongoDB: %v", err)
 	}
-
 	disconnectClient := func() error {
 		return disconnect(ctx, client)
 	}
@@ -43,20 +26,20 @@ func SetupMongoDB(ctx context.Context) (*mongo.Database, func() error) {
 }
 
 // connect establishes a connection to MongoDB and returns the client and database
-func connect(ctx context.Context, config *mongoConfig) (*mongo.Client, *mongo.Database, error) {
+func connect(ctx context.Context, cf *config.MongoConfig) (*mongo.Client, *mongo.Database, error) {
 	// Create a context with timeout for the connection
-	connectionCtx, cancel := context.WithTimeout(ctx, config.timeout)
+	connectionCtx, cancel := context.WithTimeout(ctx, cf.Timeout)
 	defer cancel()
 
 	// Set client options
 	clientOpts := options.Client().
-		ApplyURI(config.uri).
-		SetMaxPoolSize(100).
-		SetMinPoolSize(5).
-		SetMaxConnIdleTime(30 * time.Minute).
-		SetRetryWrites(true).
-		SetRetryReads(true).
-		SetReplicaSet(config.replicaSet)
+		ApplyURI(cf.Uri).
+		SetMaxPoolSize(uint64(cf.MaxPoolSize)).
+		SetMinPoolSize(uint64(cf.MinPoolSize)).
+		SetMaxConnIdleTime(cf.ConnIdleTime).
+		SetRetryWrites(cf.RetryWrites).
+		SetRetryReads(cf.RetryReads).
+		SetReplicaSet(cf.ReplicaSet)
 
 	//Connect to MongoDB
 	client, err := mongo.Connect(connectionCtx, clientOpts)
@@ -64,15 +47,15 @@ func connect(ctx context.Context, config *mongoConfig) (*mongo.Client, *mongo.Da
 		return nil, nil, err
 	}
 	// Verify connection
-	pingCtx, cancel := context.WithTimeout(ctx, config.timeout)
+	pingCtx, cancel := context.WithTimeout(ctx, cf.Timeout)
 	defer cancel()
 
 	if err := client.Ping(pingCtx, readpref.Primary()); err != nil {
 		return nil, nil, err
 	}
-
+	log.Default().Println("✅ Connected to MongoDB")
 	// Get the database
-	db := client.Database(config.databaseName)
+	db := client.Database(cf.DatabaseName)
 	return client, db, nil
 }
 

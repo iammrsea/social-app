@@ -12,14 +12,13 @@ import (
 	"github.com/iammrsea/social-app/internal"
 	"github.com/iammrsea/social-app/internal/shared/auth"
 	"github.com/iammrsea/social-app/internal/shared/config"
-	"github.com/iammrsea/social-app/internal/shared/config/db"
 	"github.com/iammrsea/social-app/internal/shared/rbac"
-	"github.com/iammrsea/social-app/internal/user/infra/db/mongodb"
+	"github.com/iammrsea/social-app/internal/shared/storage"
 	"github.com/iammrsea/social-app/internal/user/service"
 )
 
 func main() {
-	port := config.Env().Port()
+	port := config.NewEnv().Port()
 
 	router := chi.NewRouter()
 
@@ -37,14 +36,20 @@ func main() {
 
 	ctx := context.Background()
 
-	// Use any database of your choice
-	mongoDB, closeConnection := db.SetupMongoDB(ctx)
+	// // Use any database of your choice
+	// mongoDB, closeConnection := db.SetupMongoDB(ctx)
 
-	defer closeConnection()
+	storage, closeStorage, err := storage.NewStorage(ctx, config.StorageEngines.PostgreSQL)
+
+	if err != nil {
+		log.Fatalf("failed to initialize storage: %v", err)
+	}
+
+	defer closeStorage()
 
 	// Repositories
-	userRepo := mongodb.NewUserRepository(mongoDB)
-	userReadModelRepo := mongodb.NewUserReadModelRepository(mongoDB)
+	userRepo := storage.Repos.UserRepo
+	userReadModelRepo := storage.Repos.UserReadModelRepo
 
 	// Guard
 	policy := rbac.NewPolicy()

@@ -30,7 +30,7 @@ func (a *AuthenticatedUser) IsAuthenticated() bool {
 
 func AuthMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if config.Env().GoEnv() == config.Test {
+		if config.NewEnv().GoEnv() == config.Test {
 			user := GetFakeUser(rbac.Admin)
 			ctx := context.WithValue(r.Context(), userCtxKey, user)
 			next.ServeHTTP(w, r.WithContext(ctx))
@@ -79,7 +79,7 @@ func ParseTokenFromRequest(r *http.Request) *AuthClaims {
 
 	bearerToken := parts[1]
 
-	secret := []byte(config.Env().AuthSecret())
+	secret := []byte(config.NewEnv().AuthSecret())
 
 	token, err := jwt.ParseWithClaims(bearerToken, &AuthClaims{}, func(t *jwt.Token) (any, error) {
 		return secret, nil

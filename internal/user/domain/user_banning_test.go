@@ -61,14 +61,14 @@ func TestBan(t *testing.T) {
 			if c.name == "should ban a user indefinitely" {
 				assert.Nil(err)
 				assert.True(user.IsBanned())
-				assert.True(user.IsBanIndefinitely())
+				assert.True(user.IsBanIndefinite())
 				assert.True(user.BanStartDate().IsZero())
 				assert.True(user.BanEndDate().IsZero())
 				assert.Equal(c.reason, user.ReasonForBan())
 			} else if c.name == "should ban a user within a time period and not indefinitely" {
 				assert.Nil(err)
 				assert.True(user.IsBanned())
-				assert.False(user.IsBanIndefinitely())
+				assert.False(user.IsBanIndefinite())
 				assert.Equal(c.timeline, domain.NewBanTimeline(user.BanStartDate(), user.BanEndDate()))
 				assert.Equal(c.reason, user.ReasonForBan())
 			} else if c.name == "should return correct error if user is already banned" {
@@ -115,5 +115,5 @@ func createUser() domain.User {
 		"john-doe", rbac.Regular,
 		time.Now(),
 		time.Now(),
-		nil)
+		nil, nil)
 }

@@ -18,6 +18,7 @@ func TestMakeModerator(t *testing.T) {
 			"johndoe", rbac.Moderator,
 			time.Now(),
 			time.Now(),
+			nil,
 			nil)
 		err := user.MakeModerator()
 		assert.NotNil(t, err)
@@ -32,6 +33,7 @@ func TestMakeModerator(t *testing.T) {
 			rbac.Regular,
 			time.Now(),
 			time.Now(),
+			nil,
 			nil)
 		err := user.MakeModerator()
 		assert.Nil(t, err)
@@ -52,6 +54,7 @@ func TestMakeRegular(t *testing.T) {
 			rbac.Regular,
 			time.Now(),
 			time.Now(),
+			nil,
 			nil)
 		err := user.MakeRegular()
 		assert.NotNil(t, err)
@@ -63,6 +66,7 @@ func TestMakeRegular(t *testing.T) {
 			"user-id", "johndoe@gmail.com",
 			"johndoe", rbac.Moderator,
 			time.Now(), time.Now(),
+			nil,
 			nil)
 		err := user.MakeRegular()
 		assert.Nil(t, err)

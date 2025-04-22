@@ -17,6 +17,7 @@ type CommandHandler struct {
 	MakeModerator      command.MakeModeratorHandler
 	ChangeUsername     command.ChangeUsernameHandler
 	BanUser            command.BanUserHandler
+	UnbanUser          command.UnbanUserHandler
 }
 
 type QueryHandler struct {

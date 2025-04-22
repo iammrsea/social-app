@@ -56,6 +56,11 @@ func (r *UserRepository) ChangeUsername(ctx context.Context, userId string, upda
 	return r.getAndUpdateUser(ctx, userId, updateFn)
 }
 
+// UnbanUser unbans a user
+func (r *UserRepository) UnbanUser(ctx context.Context, userId string, updateFn func(user *domain.User) error) error {
+	return r.getAndUpdateUser(ctx, userId, updateFn)
+}
+
 // BanUser bans a user
 func (r *UserRepository) BanUser(ctx context.Context, userId string, updateFn func(user *domain.User) error) error {
 	return r.getAndUpdateUser(ctx, userId, updateFn)

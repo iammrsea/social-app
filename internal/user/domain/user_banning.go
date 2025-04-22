@@ -72,6 +72,10 @@ func (u *User) UnBan() error {
 	}
 
 	u.banStatus.isBanned = false
+	u.banStatus.reason = ""
+	u.banStatus.isIndefinite = false
+	u.banStatus.from = time.Time{}
+	u.banStatus.to = time.Time{}
 
 	return nil
 }

@@ -1,4 +1,4 @@
-package mongodb
+package mongoimpl
 
 import (
 	"context"
@@ -80,38 +80,77 @@ func (r *UserRepository) GetUserBy(ctx context.Context, fieldName string, value 
 	return &user, nil
 }
 
+// UserExists finds a user by a field name and value
+func (r *UserRepository) UserExists(ctx context.Context, email string, username any) (bool, error) {
+	var doc userDocument
+	filter := bson.M{
+		"$or": []bson.M{
+			{"email": email},
+			{"username": username},
+		},
+	}
+	//find user by email or username
+	err := r.collection.FindOne(ctx, filter).Decode(&doc)
+	if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return false, nil
+		}
+		return false, err
+	}
+	return true, nil
+}
+
 // getAndUpdateUser is a helper function for updating user documents
 func (r *UserRepository) getAndUpdateUser(ctx context.Context, userId string, updateFn func(user *domain.User) error) error {
 	// Start a session and transaction
-	session, err := r.collection.Database().Client().StartSession()
+	// session, err := r.collection.Database().Client().StartSession()
+	// if err != nil {
+	// 	return err
+	// }
+	// defer session.EndSession(ctx)
+
+	// callback := func(sessionCtx mongo.SessionContext) (any, error) {
+	// 	// Get the current user
+	// 	var doc userDocument
+	// 	err := r.collection.FindOne(sessionCtx, bson.M{"_id": userId}).Decode(&doc)
+	// 	if err != nil {
+	// 		if errors.Is(err, mongo.ErrNoDocuments) {
+	// 			return nil, domain.ErrUserNotFound
+	// 		}
+	// 		return nil, err
+	// 	}
+	// 	// Convert to domain model
+	// 	user := doc.toDomain()
+	// 	//Apply the update function
+	// 	err = updateFn(&user)
+	// 	if err != nil {
+	// 		return nil, err
+	// 	}
+	// 	//Convert back to document and update
+	// 	updatedDoc := fromDomain(user)
+	// 	_, err = r.collection.ReplaceOne(sessionCtx, bson.M{"_id": userId}, updatedDoc)
+	// 	return nil, err
+	// }
+	// _, err = session.WithTransaction(ctx, callback)
+
+	// Get the current user
+	var doc userDocument
+	err := r.collection.FindOne(ctx, bson.M{"_id": userId}).Decode(&doc)
+	if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return domain.ErrUserNotFound
+		}
+		return err
+	}
+	// Convert to domain model
+	user := doc.toDomain()
+	//Apply the update function
+	err = updateFn(&user)
 	if err != nil {
 		return err
 	}
-	defer session.EndSession(ctx)
-
-	callback := func(sessionCtx mongo.SessionContext) (any, error) {
-		// Get the current user
-		var doc userDocument
-		err := r.collection.FindOne(sessionCtx, bson.M{"_id": userId}).Decode(&doc)
-		if err != nil {
-			if errors.Is(err, mongo.ErrNoDocuments) {
-				return nil, domain.ErrUserNotFound
-			}
-			return nil, err
-		}
-		// Convert to domain model
-		user := doc.toDomain()
-		//Apply the update function
-		err = updateFn(&user)
-		if err != nil {
-			return nil, err
-		}
-		//Convert back to document and update
-		updatedDoc := fromDomain(user)
-		_, err = r.collection.ReplaceOne(sessionCtx, bson.M{"_id": userId}, updatedDoc)
-		return nil, err
-	}
-	_, err = session.WithTransaction(ctx, callback)
-
+	//Convert back to document and update
+	updatedDoc := fromDomain(user)
+	_, err = r.collection.ReplaceOne(ctx, bson.M{"_id": userId}, updatedDoc)
 	return err
 }

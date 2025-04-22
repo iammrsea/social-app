@@ -2,16 +2,15 @@ package service
 
 import (
 	"github.com/iammrsea/social-app/internal/shared/rbac"
-	"github.com/iammrsea/social-app/internal/user/app"
 	"github.com/iammrsea/social-app/internal/user/app/command"
 	"github.com/iammrsea/social-app/internal/user/app/query"
 	"github.com/iammrsea/social-app/internal/user/domain"
 )
 
 // Constructor of the user application layer
-func NewUserService(userRepo domain.UserRepository, userReadModelRepo domain.UserReadModelRepository, guard rbac.RequestGuard) *app.Application {
-	return &app.Application{
-		CommandHandler: app.CommandHandler{
+func New(userRepo domain.UserRepository, userReadModelRepo domain.UserReadModelRepository, guard rbac.RequestGuard) *Application {
+	return &Application{
+		CommandHandler: CommandHandler{
 			RegisterUser:       command.NewRegisterUserHandler(userRepo, guard),
 			RevokeAwardedBadge: command.NewRevokeAwardedBadgeHandler(userRepo, guard),
 			AwardBadge:         command.NewAwardBadgeHandler(userRepo, guard),
@@ -20,7 +19,7 @@ func NewUserService(userRepo domain.UserRepository, userReadModelRepo domain.Use
 			BanUser:            command.NewBanUserHandler(userRepo, guard),
 			UnbanUser:          command.NewUnbanUserHandler(userRepo, guard),
 		},
-		QueryHandler: app.QueryHandler{
+		QueryHandler: QueryHandler{
 			GetUserById:    query.NewGetUserByIdHandler(userReadModelRepo, guard),
 			GetUsers:       query.NewGetUsersHandler(userReadModelRepo, guard),
 			GetUserByEmail: query.NewGetUserByEmailHandler(userReadModelRepo, guard),

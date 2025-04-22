@@ -1,4 +1,4 @@
-package mongodb
+package mongoimpl
 
 import (
 	"time"
@@ -52,6 +52,7 @@ func fromDomain(user domain.User) userDocument {
 			BanStartDate:    user.BanStartDate(),
 			BanEndDate:      user.BanEndDate(),
 			IsBanIndefinite: user.IsBanIndefinite(),
+			ReasonForBan:    user.ReasonForBan(),
 		},
 	}
 }

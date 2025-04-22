@@ -8,8 +8,8 @@ import (
 	"github.com/iammrsea/social-app/internal/shared/storage/mongodb"
 	"github.com/iammrsea/social-app/internal/shared/storage/postgres"
 	"github.com/iammrsea/social-app/internal/user/domain"
-	mongoUserRepo "github.com/iammrsea/social-app/internal/user/infra/repos/mongodb"
-	pgUserRepo "github.com/iammrsea/social-app/internal/user/infra/repos/postgres"
+	mongoUserRepo "github.com/iammrsea/social-app/internal/user/infra/repos/mongoimpl"
+	pgUserRepo "github.com/iammrsea/social-app/internal/user/infra/repos/postgresimpl"
 )
 
 type Storage struct {

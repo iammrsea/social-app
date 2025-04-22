@@ -1,4 +1,4 @@
-package memory_test
+package memoryimpl_test
 
 import (
 	"context"
@@ -8,7 +8,7 @@ import (
 
 	"github.com/iammrsea/social-app/internal/shared/rbac"
 	"github.com/iammrsea/social-app/internal/user/domain"
-	"github.com/iammrsea/social-app/internal/user/infra/repos/memory"
+	"github.com/iammrsea/social-app/internal/user/infra/repos/memoryimpl"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -23,7 +23,7 @@ func TestRegister(t *testing.T) {
 			time.Now(),
 			nil, nil)
 
-		memRepo := memory.NewUserRepository(context.Background())
+		memRepo := memoryimpl.NewUserRepository(context.Background())
 
 		ctx := context.Background()
 
@@ -43,7 +43,7 @@ func TestRegister(t *testing.T) {
 			time.Now(),
 			time.Now(), nil, nil)
 
-		memRepo := memory.NewUserRepository(context.Background())
+		memRepo := memoryimpl.NewUserRepository(context.Background())
 
 		ctx := context.Background()
 
@@ -67,7 +67,7 @@ func TestMakeModerator(t *testing.T) {
 			time.Now(),
 			time.Now(), nil, nil)
 
-		memRepo := memory.NewUserRepository(context.Background())
+		memRepo := memoryimpl.NewUserRepository(context.Background())
 
 		ctx := context.Background()
 
@@ -87,7 +87,7 @@ func TestMakeModerator(t *testing.T) {
 	t.Run("should return correct error if user does not exist", func(t *testing.T) {
 		t.Parallel()
 
-		memRepo := memory.NewUserRepository(context.Background())
+		memRepo := memoryimpl.NewUserRepository(context.Background())
 
 		ctx := context.Background()
 
@@ -109,7 +109,7 @@ func TestAwardBadge(t *testing.T) {
 			time.Now(),
 			time.Now(), nil, nil)
 
-		memRepo := memory.NewUserRepository(context.Background())
+		memRepo := memoryimpl.NewUserRepository(context.Background())
 
 		ctx := context.Background()
 
@@ -129,7 +129,7 @@ func TestAwardBadge(t *testing.T) {
 	t.Run("should return correct error if user does not exist", func(t *testing.T) {
 		t.Parallel()
 
-		memRepo := memory.NewUserRepository(context.Background())
+		memRepo := memoryimpl.NewUserRepository(context.Background())
 
 		ctx := context.Background()
 
@@ -151,7 +151,7 @@ func TestRevokeAwardedBadge(t *testing.T) {
 			time.Now(),
 			time.Now(), nil, nil)
 
-		memRepo := memory.NewUserRepository(context.Background())
+		memRepo := memoryimpl.NewUserRepository(context.Background())
 
 		ctx := context.Background()
 
@@ -176,7 +176,7 @@ func TestRevokeAwardedBadge(t *testing.T) {
 	t.Run("should return correct error if user does not exist", func(t *testing.T) {
 		t.Parallel()
 
-		memRepo := memory.NewUserRepository(context.Background())
+		memRepo := memoryimpl.NewUserRepository(context.Background())
 
 		ctx := context.Background()
 
@@ -198,7 +198,7 @@ func TestChangeUsername(t *testing.T) {
 		user := domain.MustNewUser("user-id", "johndoe@gmail.com", "johndoe", rbac.Regular, time.Now(),
 			time.Now(), nil, nil)
 
-		memRepo := memory.NewUserRepository(context.Background())
+		memRepo := memoryimpl.NewUserRepository(context.Background())
 
 		ctx := context.Background()
 
@@ -218,7 +218,7 @@ func TestChangeUsername(t *testing.T) {
 	t.Run("should return correct error if user does not exist", func(t *testing.T) {
 		t.Parallel()
 
-		memRepo := memory.NewUserRepository(context.Background())
+		memRepo := memoryimpl.NewUserRepository(context.Background())
 
 		ctx := context.Background()
 
@@ -240,7 +240,7 @@ func TestGetUserById(t *testing.T) {
 			time.Now(),
 			time.Now(), nil, nil)
 
-		memRepo := memory.NewUserRepository(context.Background())
+		memRepo := memoryimpl.NewUserRepository(context.Background())
 
 		ctx := context.Background()
 
@@ -255,7 +255,7 @@ func TestGetUserById(t *testing.T) {
 	t.Run("should return correct error if user does not exist", func(t *testing.T) {
 		t.Parallel()
 
-		memRepo := memory.NewUserRepository(context.Background())
+		memRepo := memoryimpl.NewUserRepository(context.Background())
 
 		ctx := context.Background()
 
@@ -269,7 +269,7 @@ func TestGetUserById(t *testing.T) {
 func TestGetUsers(t *testing.T) {
 	t.Parallel()
 
-	memRepo := memory.NewUserRepository(context.Background())
+	memRepo := memoryimpl.NewUserRepository(context.Background())
 
 	ctx := context.Background()
 	user := domain.MustNewUser("user-id", "johndoe@gmail.com", "johndoe", rbac.Regular,
@@ -291,7 +291,7 @@ func TestGetUserByEmail(t *testing.T) {
 	t.Run("should be able to get user by email", func(t *testing.T) {
 		t.Parallel()
 
-		memRepo := memory.NewUserRepository(context.Background())
+		memRepo := memoryimpl.NewUserRepository(context.Background())
 
 		ctx := context.Background()
 		user := domain.MustNewUser("user-id", "johndoe@gmail.com",
@@ -311,7 +311,7 @@ func TestGetUserByEmail(t *testing.T) {
 	t.Run("should correct error if user does not exist", func(t *testing.T) {
 		t.Parallel()
 
-		memRepo := memory.NewUserRepository(context.Background())
+		memRepo := memoryimpl.NewUserRepository(context.Background())
 
 		ctx := context.Background()
 

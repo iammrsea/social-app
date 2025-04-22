@@ -3,3 +3,4 @@ demo.go
 .env.production
 tmp
 __debug
+coverage.out

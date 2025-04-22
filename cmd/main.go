@@ -14,7 +14,7 @@ import (
 	"github.com/iammrsea/social-app/internal/shared/config"
 	"github.com/iammrsea/social-app/internal/shared/rbac"
 	"github.com/iammrsea/social-app/internal/shared/storage"
-	"github.com/iammrsea/social-app/internal/user/service"
+	userService "github.com/iammrsea/social-app/internal/user/app"
 )
 
 func main() {
@@ -56,7 +56,7 @@ func main() {
 	guard := rbac.NewRequestGuard(policy)
 
 	services := &internal.Services{
-		UserService: service.NewUserService(userRepo, userReadModelRepo, guard),
+		UserService: userService.New(userRepo, userReadModelRepo, guard),
 	}
 
 	graphql.SetupHttGraphQLServer(router, services)

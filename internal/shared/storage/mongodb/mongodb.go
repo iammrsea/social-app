@@ -18,6 +18,7 @@ func SetupMongoDB(ctx context.Context, cf *config.MongoConfig) (*mongo.Database,
 	if err != nil {
 		log.Fatalf("Failed to connect to MongoDB: %v", err)
 	}
+	log.Default().Println("✅ Connected to MongoDB")
 	disconnectClient := func() error {
 		return disconnect(ctx, client)
 	}
@@ -53,7 +54,6 @@ func connect(ctx context.Context, cf *config.MongoConfig) (*mongo.Client, *mongo
 	if err := client.Ping(pingCtx, readpref.Primary()); err != nil {
 		return nil, nil, err
 	}
-	log.Default().Println("✅ Connected to MongoDB")
 	// Get the database
 	db := client.Database(cf.DatabaseName)
 	return client, db, nil

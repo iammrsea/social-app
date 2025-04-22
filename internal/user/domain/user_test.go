@@ -142,3 +142,10 @@ func TestDecrementReputationScoreBy(t *testing.T) {
 		assert.Equal(t, user.ReputationScore(), score-1)
 	})
 }
+
+// func TestMain(m *testing.M) {
+// 	// Test code here
+// 	fmt.Println("Hello, World!")
+// 	// log.Fatal("end!!!")cle
+// 	m.Run()
+// }

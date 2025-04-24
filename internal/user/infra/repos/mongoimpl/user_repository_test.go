@@ -21,30 +21,37 @@ func TestUserRepository(t *testing.T) {
 	t.Parallel()
 	client := testutil.SetupTestMongoDb(t)
 	require.NotNil(t, client)
+
 	t.Run("Register", func(t *testing.T) {
 		t.Parallel()
 		testRegisterUser(t, client)
 	})
+
 	t.Run("ChangeUsername", func(t *testing.T) {
 		t.Parallel()
 		testChangeUsername(t, client)
 	})
+
 	t.Run("AwardBadge", func(t *testing.T) {
 		t.Parallel()
 		testAwardBadge(t, client)
 	})
+
 	t.Run("BanUser", func(t *testing.T) {
 		t.Parallel()
 		testBanUser(t, client)
 	})
+
 	t.Run("UnbanUser", func(t *testing.T) {
 		t.Parallel()
 		testUnbanUser(t, client)
 	})
+
 	t.Run("MakeModerator", func(t *testing.T) {
 		t.Parallel()
 		testMakeModerator(t, client)
 	})
+
 	t.Run("RevokeAwardedBadge", func(t *testing.T) {
 		t.Parallel()
 		testRevokeAwardedBadge(t, client)
@@ -59,10 +66,12 @@ func TestUserRepository(t *testing.T) {
 		t.Parallel()
 		testGetUserByEmail(t, client)
 	})
+
 	t.Run("GetUserById", func(t *testing.T) {
 		t.Parallel()
 		testGetUserById(t, client)
 	})
+
 	t.Run("GetUsers", func(t *testing.T) {
 		t.Parallel()
 		testGetUsers(t, client)

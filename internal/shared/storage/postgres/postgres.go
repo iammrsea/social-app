@@ -19,11 +19,6 @@ type postgresConfig struct {
 	timeout      time.Duration
 }
 
-// maxPoolSize:  100,
-// 		minPoolSize:  5,
-// 		connIdleTime: 30 * time.Minute,
-// 		timeout:      10 * time.Second,
-
 // SetupPostgres sets up and connects to PostgreSQL
 func SetupPostgreSQL(ctx context.Context, cf *config.PostgresConfig) (*pgxpool.Pool, func() error) {
 	pool, err := connect(ctx, cf)

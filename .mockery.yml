@@ -1,0 +1,23 @@
+all: false
+dir: "{{.InterfaceDir}}/mocks"
+force-file-write: true
+formatter: goimports
+log-level: info
+structname: "{{.Mock}}{{.InterfaceName}}"
+pkgname: "{{.SrcPackageName}}"
+recursive: false
+require-template-schema-exists: true
+template: testify
+template-schema: "{{.Template}}.schema.json"
+packages:
+  github.com/iammrsea/social-app/internal/user/domain:
+    config:
+      all: true
+      filename: "user_repository_mocks.go"
+      pkgname: "{{.SrcPackageName}}_mocks"
+  github.com/iammrsea/social-app/internal/shared/guards:
+    config:
+      filename: "guards_mocks.go"
+      pkgname: "{{.SrcPackageName}}_mocks"
+    interfaces:
+      Guards:

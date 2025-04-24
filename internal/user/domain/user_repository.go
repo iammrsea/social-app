@@ -13,4 +13,5 @@ type UserRepository interface {
 	UnbanUser(ctx context.Context, userId string, updateFn func(user *User) error) error
 	BanUser(ctx context.Context, userId string, updateFn func(user *User) error) error
 	GetUserBy(ctx context.Context, fieldName string, value any) (*User, error)
+	UserExists(ctx context.Context, email string, username string) (bool, error)
 }

@@ -1,13 +1,11 @@
 package abac
 
-//ABAC => Attribute-Based Access Control
-
 import (
 	"github.com/iammrsea/social-app/internal/shared/auth"
-	"github.com/iammrsea/social-app/internal/shared/rbac"
+	"github.com/iammrsea/social-app/internal/shared/guards/rbac"
 )
 
-func CanChangeUsername(userId string, authUser *auth.AuthenticatedUser) error {
+func (g *AttributeBasedGuard) CanChangeUsername(userId string, authUser *auth.AuthenticatedUser) error {
 	switch authUser.Role {
 	case rbac.Admin:
 		return nil

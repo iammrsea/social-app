@@ -7,7 +7,7 @@ import (
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/iammrsea/social-app/internal/shared/config"
-	"github.com/iammrsea/social-app/internal/shared/rbac"
+	"github.com/iammrsea/social-app/internal/shared/guards/rbac"
 )
 
 type contextKey int

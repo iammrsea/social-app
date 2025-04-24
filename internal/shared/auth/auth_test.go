@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/iammrsea/social-app/internal/shared/auth"
-	"github.com/iammrsea/social-app/internal/shared/rbac"
+	"github.com/iammrsea/social-app/internal/shared/guards/rbac"
 	"github.com/stretchr/testify/assert"
 )
 

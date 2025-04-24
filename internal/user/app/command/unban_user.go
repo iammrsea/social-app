@@ -5,7 +5,8 @@ import (
 
 	"github.com/iammrsea/social-app/internal/shared"
 	"github.com/iammrsea/social-app/internal/shared/auth"
-	"github.com/iammrsea/social-app/internal/shared/rbac"
+	"github.com/iammrsea/social-app/internal/shared/guards"
+	"github.com/iammrsea/social-app/internal/shared/guards/rbac"
 	"github.com/iammrsea/social-app/internal/user/domain"
 )
 
@@ -17,10 +18,10 @@ type UnbanUserHandler = shared.CommandHandler[UnbanUser]
 
 type unbanUserHandler struct {
 	userRepo domain.UserRepository
-	guard    rbac.RequestGuard
+	guard    guards.Guards
 }
 
-func NewUnbanUserHandler(userRepo domain.UserRepository, guard rbac.RequestGuard) UnbanUserHandler {
+func NewUnbanUserHandler(userRepo domain.UserRepository, guard guards.Guards) UnbanUserHandler {
 	if userRepo == nil || guard == nil {
 		panic("nil user Repository or guard")
 	}

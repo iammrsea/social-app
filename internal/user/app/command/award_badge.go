@@ -5,7 +5,8 @@ import (
 
 	"github.com/iammrsea/social-app/internal/shared"
 	"github.com/iammrsea/social-app/internal/shared/auth"
-	"github.com/iammrsea/social-app/internal/shared/rbac"
+	"github.com/iammrsea/social-app/internal/shared/guards"
+	"github.com/iammrsea/social-app/internal/shared/guards/rbac"
 	"github.com/iammrsea/social-app/internal/user/domain"
 )
 
@@ -18,10 +19,10 @@ type AwardBadgeHandler = shared.CommandHandler[AwardBadge]
 
 type awardBadgeHandler struct {
 	userRepo domain.UserRepository
-	guard    rbac.RequestGuard
+	guard    guards.Guards
 }
 
-func NewAwardBadgeHandler(userRepo domain.UserRepository, guard rbac.RequestGuard) AwardBadgeHandler {
+func NewAwardBadgeHandler(userRepo domain.UserRepository, guard guards.Guards) AwardBadgeHandler {
 	if userRepo == nil || guard == nil {
 		panic("nil user repository or guard")
 	}

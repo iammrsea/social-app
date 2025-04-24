@@ -12,7 +12,7 @@ import (
 	"github.com/iammrsea/social-app/internal"
 	"github.com/iammrsea/social-app/internal/shared/auth"
 	"github.com/iammrsea/social-app/internal/shared/config"
-	"github.com/iammrsea/social-app/internal/shared/rbac"
+	"github.com/iammrsea/social-app/internal/shared/guards"
 	"github.com/iammrsea/social-app/internal/shared/storage"
 	userService "github.com/iammrsea/social-app/internal/user/app"
 )
@@ -51,9 +51,8 @@ func main() {
 	userRepo := storage.Repos.UserRepo
 	userReadModelRepo := storage.Repos.UserReadModelRepo
 
-	// Guard
-	policy := rbac.NewPolicy()
-	guard := rbac.NewRequestGuard(policy)
+	// Guards
+	guard := guards.New()
 
 	services := &internal.Services{
 		UserService: userService.New(userRepo, userReadModelRepo, guard),

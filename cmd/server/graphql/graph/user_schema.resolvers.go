@@ -159,7 +159,6 @@ func (r *queryResolver) GetUserByEmail(ctx context.Context, email string) (*doma
 	return r.Services.UserService.QueryHandler.GetUserByEmail.Handle(ctx, query.GetUserByEmail{
 		Email: email,
 	})
-
 }
 
 // ReputationScore is the resolver for the reputationScore field.
@@ -171,24 +170,3 @@ func (r *userReputationResolver) ReputationScore(ctx context.Context, obj *domai
 func (r *Resolver) UserReputation() UserReputationResolver { return &userReputationResolver{r} }
 
 type userReputationResolver struct{ *Resolver }
-
-// !!! WARNING !!!
-// The code below was going to be deleted when updating resolvers. It has been copied here so you have
-// one last chance to move it out of harms way if you want. There are two reasons this happens:
-//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
-//    it when you're done.
-//  - You have helper methods in this file. Move them out to keep these resolver files clean.
-/*
-	func (r *userResolver) BanStatus(ctx context.Context, obj *domain.UserReadModel) (*model.UserBanStatus, error) {
-	fmt.Println("Ban status: ", obj.BanStatus)
-	return &model.UserBanStatus{
-		BannedAt:        obj.BanStatus.BannedAt,
-		ReasonForBan:    &obj.BanStatus.ReasonForBan,
-		BanStartDate:    obj.BanStatus.BanStartDate,
-		BanEndDate:      obj.BanStatus.BanEndDate,
-		IsBanIndefinite: obj.BanStatus.IsBanIndefinite,
-	}, nil
-}
-func (r *Resolver) User() UserResolver { return &userResolver{r} }
-type userResolver struct{ *Resolver }
-*/

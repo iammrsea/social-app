@@ -13,8 +13,8 @@ import (
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/iammrsea/social-app/cmd/server/graphql/graph/model"
+	"github.com/iammrsea/social-app/internal/shared/guards/rbac"
 	"github.com/iammrsea/social-app/internal/shared/pagination"
-	"github.com/iammrsea/social-app/internal/shared/rbac"
 	"github.com/iammrsea/social-app/internal/user/domain"
 	"github.com/vektah/gqlparser/v2/ast"
 )
@@ -197,7 +197,7 @@ func (ec *executionContext) _User_role(ctx context.Context, field graphql.Collec
 	}
 	res := resTmp.(rbac.UserRole)
 	fc.Result = res
-	return ec.marshalNUserRole2githubᚗcomᚋiammrseaᚋsocialᚑappᚋinternalᚋsharedᚋrbacᚐUserRole(ctx, field.Selections, res)
+	return ec.marshalNUserRole2githubᚗcomᚋiammrseaᚋsocialᚑappᚋinternalᚋsharedᚋguardsᚋrbacᚐUserRole(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_User_role(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1466,13 +1466,13 @@ func (ec *executionContext) marshalNUserEdge2ᚖgithubᚗcomᚋiammrseaᚋsocial
 	return ec._UserEdge(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNUserRole2githubᚗcomᚋiammrseaᚋsocialᚑappᚋinternalᚋsharedᚋrbacᚐUserRole(ctx context.Context, v any) (rbac.UserRole, error) {
+func (ec *executionContext) unmarshalNUserRole2githubᚗcomᚋiammrseaᚋsocialᚑappᚋinternalᚋsharedᚋguardsᚋrbacᚐUserRole(ctx context.Context, v any) (rbac.UserRole, error) {
 	tmp, err := graphql.UnmarshalString(v)
 	res := rbac.UserRole(tmp)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNUserRole2githubᚗcomᚋiammrseaᚋsocialᚑappᚋinternalᚋsharedᚋrbacᚐUserRole(ctx context.Context, sel ast.SelectionSet, v rbac.UserRole) graphql.Marshaler {
+func (ec *executionContext) marshalNUserRole2githubᚗcomᚋiammrseaᚋsocialᚑappᚋinternalᚋsharedᚋguardsᚋrbacᚐUserRole(ctx context.Context, sel ast.SelectionSet, v rbac.UserRole) graphql.Marshaler {
 	res := graphql.MarshalString(string(v))
 	if res == graphql.Null {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {

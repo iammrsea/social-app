@@ -81,7 +81,7 @@ func (r *UserRepository) GetUserBy(ctx context.Context, fieldName string, value 
 }
 
 // UserExists finds a user by a field name and value
-func (r *UserRepository) UserExists(ctx context.Context, email string, username any) (bool, error) {
+func (r *UserRepository) UserExists(ctx context.Context, email string, username string) (bool, error) {
 	var doc userDocument
 	filter := bson.M{
 		"$or": []bson.M{

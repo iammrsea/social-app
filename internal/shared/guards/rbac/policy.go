@@ -13,8 +13,8 @@ func NewPolicy() *Policy {
 		rules: map[UserRole][]Permission{
 			Regular:   {ViewUser},
 			Admin:     {ViewUser},
-			Moderator: {ViewUser, ListUsers},
-			Guest:     {},
+			Moderator: {ViewUser, ListUsers, BanUser, UnbanUser},
+			Guest:     {CreateAccount},
 		},
 	}
 }

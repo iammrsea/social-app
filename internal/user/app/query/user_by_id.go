@@ -5,7 +5,8 @@ import (
 
 	"github.com/iammrsea/social-app/internal/shared"
 	"github.com/iammrsea/social-app/internal/shared/auth"
-	"github.com/iammrsea/social-app/internal/shared/rbac"
+	"github.com/iammrsea/social-app/internal/shared/guards"
+	"github.com/iammrsea/social-app/internal/shared/guards/rbac"
 	"github.com/iammrsea/social-app/internal/user/domain"
 )
 
@@ -17,10 +18,10 @@ type GetUserById struct {
 
 type getUserByIdHandler struct {
 	queryRepo domain.UserReadModelRepository
-	guard     rbac.RequestGuard
+	guard     guards.Guards
 }
 
-func NewGetUserByIdHandler(queryRepo domain.UserReadModelRepository, guard rbac.RequestGuard) GetUserByIdHandler {
+func NewGetUserByIdHandler(queryRepo domain.UserReadModelRepository, guard guards.Guards) GetUserByIdHandler {
 	if queryRepo == nil || guard == nil {
 		panic("nil user repository or guard")
 	}

@@ -67,6 +67,11 @@ func (r *UserRepository) UnbanUser(ctx context.Context, userId string, updateFn 
 	return r.updateUser(ctx, userId, updateFn)
 }
 
+// UserExists finds a user by a field name and value
+func (r *UserRepository) UserExists(ctx context.Context, email string, username string) (bool, error) {
+	panic("implement me")
+}
+
 func (r *UserRepository) GetUserBy(ctx context.Context, fieldName string, value any) (*domain.User, error) {
 	query := fmt.Sprintf(`
         SELECT id, username, email, role, reputation_score, badges, is_banned, banned_at, ban_start_date, ban_end_date,

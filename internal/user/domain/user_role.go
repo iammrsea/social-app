@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"slices"
 
-	"github.com/iammrsea/social-app/internal/shared/rbac"
+	"github.com/iammrsea/social-app/internal/shared/guards/rbac"
 )
 
 func (u *User) IsModerator() bool {

@@ -3,7 +3,7 @@ package mongoimpl
 import (
 	"time"
 
-	"github.com/iammrsea/social-app/internal/shared/rbac"
+	"github.com/iammrsea/social-app/internal/shared/guards/rbac"
 	"github.com/iammrsea/social-app/internal/user/domain"
 )
 

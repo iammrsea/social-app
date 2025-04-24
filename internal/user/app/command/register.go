@@ -8,7 +8,8 @@ import (
 	"github.com/iammrsea/social-app/internal/shared"
 	"github.com/iammrsea/social-app/internal/shared/auth"
 	"github.com/iammrsea/social-app/internal/shared/custom_errors"
-	"github.com/iammrsea/social-app/internal/shared/rbac"
+	"github.com/iammrsea/social-app/internal/shared/guards"
+	"github.com/iammrsea/social-app/internal/shared/guards/rbac"
 	"github.com/iammrsea/social-app/internal/user/domain"
 	"github.com/lucsky/cuid"
 )
@@ -22,10 +23,10 @@ type RegisterUserHandler = shared.CommandHandler[RegisterUser]
 
 type registerUserHandler struct {
 	userRepo domain.UserRepository
-	guard    rbac.RequestGuard
+	guard    guards.Guards
 }
 
-func NewRegisterUserHandler(userRepo domain.UserRepository, guard rbac.RequestGuard) RegisterUserHandler {
+func NewRegisterUserHandler(userRepo domain.UserRepository, guard guards.Guards) RegisterUserHandler {
 	if userRepo == nil || guard == nil {
 		panic("nil user repository or guard")
 	}
@@ -38,15 +39,15 @@ func (r *registerUserHandler) Handle(ctx context.Context, cmd RegisterUser) erro
 		return err
 	}
 
-	userExists, err := r.userRepo.GetUserBy(ctx, "email", cmd.Email)
+	userExists, err := r.userRepo.UserExists(ctx, cmd.Email, cmd.Username)
 
 	if err != nil {
 		if !errors.Is(err, domain.ErrUserNotFound) {
 			return custom_errors.ErrInternalServerError
 		}
 	}
-	if userExists != nil {
-		return domain.ErrEmailAlreadyExists
+	if userExists {
+		return domain.ErrEmailOrUsernameAlreadyExists
 	}
 
 	user, err := domain.NewUser(

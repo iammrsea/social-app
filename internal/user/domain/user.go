@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/iammrsea/social-app/internal/shared/rbac"
+	"github.com/iammrsea/social-app/internal/shared/guards/rbac"
 )
 
 type User struct {
@@ -27,16 +27,17 @@ type userReputation struct {
 }
 
 var (
-	ErrUserIdRequired        = errors.New("user id cannot be empty")
-	ErrUserEmailRequired     = errors.New("user email cannot be empty")
-	ErrUsernameRequired      = errors.New("username cannot be empty")
-	ErrUserRoleRequired      = errors.New("user role cannot be empty")
-	ErrBadgeRequired         = errors.New("badge cannot be empty")
-	ErrInvalidIncrementValue = errors.New("you cannot increment user reputation by a value less than one")
-	ErrInvalidDecrementValue = errors.New("you cannot decrement user reputation by a value less than one")
-	ErrInvalidRepScore       = errors.New("invalid reputation score")
-	ErrEmailAlreadyExists    = errors.New("email already exists")
-	ErrUserNotFound          = errors.New("user not found")
+	ErrUserIdRequired               = errors.New("user id cannot be empty")
+	ErrUserEmailRequired            = errors.New("user email cannot be empty")
+	ErrUsernameRequired             = errors.New("username cannot be empty")
+	ErrUserRoleRequired             = errors.New("user role cannot be empty")
+	ErrBadgeRequired                = errors.New("badge cannot be empty")
+	ErrInvalidIncrementValue        = errors.New("you cannot increment user reputation by a value less than one")
+	ErrInvalidDecrementValue        = errors.New("you cannot decrement user reputation by a value less than one")
+	ErrInvalidRepScore              = errors.New("invalid reputation score")
+	ErrEmailAlreadyExists           = errors.New("email already exists")
+	ErrEmailOrUsernameAlreadyExists = errors.New("email or username already exists")
+	ErrUserNotFound                 = errors.New("user not found")
 )
 
 func NewUser(

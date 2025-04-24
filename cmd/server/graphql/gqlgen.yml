@@ -167,7 +167,7 @@ models:
       - github.com/iammrsea/social-app/internal/user/domain.UserReputation
   UserRole:
     model:
-      - github.com/iammrsea/social-app/internal/shared/rbac.UserRole
+      - github.com/iammrsea/social-app/internal/shared/guards/rbac.UserRole
   PageInfo:
     model: github.com/iammrsea/social-app/internal/shared/pagination.PageInfo
   UserBanStatus:

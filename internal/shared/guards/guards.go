@@ -23,14 +23,3 @@ func New() Guards {
 		AttributeBasedGuard: abac.New(),
 	}
 }
-
-func LoadUsers(guard Guards) {
-	guard.Authorize(rbac.Admin, rbac.Permission("read"))
-	// guard.CanChangeUsername()
-}
-
-func Run() {
-	guard := New()
-
-	LoadUsers(guard)
-}
